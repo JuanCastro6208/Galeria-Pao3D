@@ -57,7 +57,7 @@ export const sitio = {
     pagina: 'GaleriaPao3D',
   },
 
-  correo: 'galeriapao3d@gmail.com',
+  correo: 'cotizaciones@galeriapao3d.com',
 
   /**
    * Video "Así trabajamos" (opcional). Aparece en la sección Proceso solo si
