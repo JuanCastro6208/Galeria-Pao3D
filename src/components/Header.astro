@@ -1,0 +1,315 @@
+---
+import { enlaceWhatsApp } from '../config/sitio';
+import Icon from './Icon.astro';
+import Logo from './Logo.astro';
+import ThemeToggle from './ThemeToggle.astro';
+
+const enlaces = [
+  { href: '#categorias', texto: 'Categorías' },
+  { href: '#galeria', texto: 'Galería' },
+  { href: '#proceso', texto: 'Proceso' },
+  { href: '#contacto', texto: 'Contacto' },
+];
+---
+
+<header class="header" data-header>
+  <div class="bar">
+    <a href="#inicio" class="bar__logo" aria-label="Ir al inicio">
+      <Logo size={30} />
+    </a>
+
+    <nav class="bar__nav" aria-label="Principal">
+      <ul>
+        {
+          enlaces.map((e) => (
+            <li>
+              <a href={e.href}>{e.texto}</a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <div class="bar__actions">
+      <ThemeToggle />
+      <button
+        type="button"
+        class="burger"
+        aria-label="Abrir menú"
+        aria-expanded="false"
+        aria-controls="menu-movil"
+        data-menu-btn
+      >
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </div>
+
+  <div class="menu" id="menu-movil" data-menu inert>
+    <nav aria-label="Menú móvil">
+      <ul>
+        {
+          enlaces.map((e, i) => (
+            <li style={`--i:${i}`}>
+              <a href={e.href} data-menu-link>
+                {e.texto}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+    <a
+      class="btn btn--primary menu__cta"
+      style={`--i:${enlaces.length}`}
+      href={enlaceWhatsApp()}
+      target="_blank"
+      rel="noopener"
+    >
+      Cotiza por WhatsApp
+      <span class="btn__icon"><Icon name="whatsapp" size="1.25rem" /></span>
+    </a>
+  </div>
+</header>
+
+<style>
+  .header {
+    position: fixed;
+    inset: 1rem 0 auto;
+    z-index: var(--z-header);
+    display: flex;
+    justify-content: center;
+    padding-inline: var(--gutter);
+    pointer-events: none;
+  }
+
+  .bar {
+    pointer-events: auto;
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    width: 100%;
+    max-width: 52rem;
+    height: 3.75rem;
+    padding: 0 0.5rem 0 1.1rem;
+    border-radius: 999px;
+    border: var(--bw) solid var(--line);
+    background: rgb(var(--bg-rgb) / 0.72);
+    backdrop-filter: blur(18px) saturate(160%);
+    -webkit-backdrop-filter: blur(18px) saturate(160%);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.06),
+      0 20px 40px -24px rgb(0 0 0 / 0.8);
+    position: relative;
+    z-index: 2;
+  }
+
+  :global([data-theme='play']) .bar {
+    background: var(--surface);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    box-shadow: 4px 4px 0 var(--line);
+  }
+
+  .bar__logo {
+    display: inline-flex;
+    border-radius: 999px;
+  }
+
+  .bar__nav {
+    margin-inline: auto;
+  }
+
+  .bar__nav ul {
+    display: flex;
+    gap: 0.25rem;
+    list-style: none;
+    padding: 0;
+  }
+
+  .bar__nav a {
+    display: block;
+    padding: 0.5rem 0.9rem;
+    border-radius: 999px;
+    font-size: var(--fs-sm);
+    font-weight: 500;
+    color: var(--muted);
+    transition:
+      color 0.25s var(--ease-out),
+      background-color 0.25s var(--ease-out);
+  }
+
+  .bar__nav a:hover {
+    color: var(--text);
+    background: var(--accent-soft);
+  }
+
+  .bar__actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  /* Hamburguesa que se transforma en X */
+  .burger {
+    display: none;
+    position: relative;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 999px;
+    background: var(--surface-2);
+  }
+
+  :global([data-theme='play']) .burger {
+    background: var(--c-amarillo);
+    border: var(--bw) solid var(--line);
+    color: var(--tone-ink);
+  }
+
+  .burger span {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 1.1rem;
+    height: 1.5px;
+    border-radius: 2px;
+    background: currentColor;
+    transition: transform 0.5s var(--ease-spring);
+  }
+
+  .burger span:first-child {
+    transform: translate(-50%, -4px);
+  }
+
+  .burger span:last-child {
+    transform: translate(-50%, 4px);
+  }
+
+  .header.is-open .burger span:first-child {
+    transform: translate(-50%, 0) rotate(45deg);
+  }
+
+  .header.is-open .burger span:last-child {
+    transform: translate(-50%, 0) rotate(-45deg);
+  }
+
+  /* Menú móvil a pantalla completa */
+  .menu {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 2.5rem;
+    padding: 7rem var(--gutter) 3rem;
+    background: rgb(var(--bg-rgb) / 0.86);
+    backdrop-filter: blur(28px);
+    -webkit-backdrop-filter: blur(28px);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: auto;
+    transition:
+      opacity 0.45s var(--ease-out),
+      visibility 0s linear 0.45s;
+  }
+
+  :global([data-theme='play']) .menu {
+    background: rgb(var(--bg-rgb) / 0.96);
+  }
+
+  .header.is-open .menu {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.45s var(--ease-out);
+  }
+
+  .menu ul {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .menu li,
+  .menu__cta {
+    opacity: 0;
+    transform: translateY(2rem);
+    transition:
+      opacity 0.6s var(--ease-out),
+      transform 0.6s var(--ease-out);
+  }
+
+  .header.is-open .menu li,
+  .header.is-open .menu__cta {
+    opacity: 1;
+    transform: none;
+    transition-delay: calc(0.08s + var(--i) * 0.06s);
+  }
+
+  .menu a[data-menu-link] {
+    font-family: var(--font-display);
+    font-weight: var(--display-weight);
+    letter-spacing: var(--display-tracking);
+    font-size: clamp(2.2rem, 9vw, 3rem);
+    line-height: 1.2;
+  }
+
+  .menu__cta {
+    align-self: flex-start;
+  }
+
+  @media (max-width: 860px) {
+    .bar__nav {
+      display: none;
+    }
+
+    .bar {
+      justify-content: space-between;
+    }
+
+    .burger {
+      display: block;
+    }
+  }
+
+  @media (min-width: 861px) {
+    .menu {
+      display: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .menu li,
+    .menu__cta {
+      transform: none;
+    }
+  }
+</style>
+
+<script>
+  const header = document.querySelector<HTMLElement>('[data-header]')!;
+  const boton = header.querySelector<HTMLButtonElement>('[data-menu-btn]')!;
+  const menu = header.querySelector<HTMLElement>('[data-menu]')!;
+
+  function abrir(estado: boolean) {
+    header.classList.toggle('is-open', estado);
+    boton.setAttribute('aria-expanded', String(estado));
+    boton.setAttribute('aria-label', estado ? 'Cerrar menú' : 'Abrir menú');
+    menu.inert = !estado;
+    document.documentElement.style.overflow = estado ? 'hidden' : '';
+  }
+
+  boton.addEventListener('click', () => abrir(!header.classList.contains('is-open')));
+  menu.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => abrir(false)));
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && header.classList.contains('is-open')) {
+      abrir(false);
+      boton.focus();
+    }
+  });
+  window.matchMedia('(min-width: 861px)').addEventListener('change', (e) => {
+    if (e.matches) abrir(false);
+  });
+</script>

@@ -1,0 +1,306 @@
+---
+import { enlaceCorreo, enlaceFacebook, enlaceInstagram, enlaceWhatsApp } from '../config/sitio';
+import type { IconName } from '../lib/iconos';
+import Icon from './Icon.astro';
+
+// Solo se muestra el logo de cada red; los datos de contacto quedan dentro del enlace.
+const canales: { id: string; icono: IconName; nombre: string; accion: string; href: string; externo: boolean }[] = [
+  { id: 'wa', icono: 'whatsapp', nombre: 'WhatsApp', accion: 'Cotiza por WhatsApp', href: enlaceWhatsApp(), externo: true },
+  { id: 'ig', icono: 'instagram', nombre: 'Instagram', accion: 'Síguenos en Instagram', href: enlaceInstagram, externo: true },
+  { id: 'fb', icono: 'facebook', nombre: 'Facebook', accion: 'Encuéntranos en Facebook', href: enlaceFacebook, externo: true },
+  { id: 'mail', icono: 'envelope', nombre: 'Correo', accion: 'Escríbenos un correo', href: enlaceCorreo, externo: false },
+];
+---
+
+<section class="section contacto" id="contacto" aria-labelledby="contacto-titulo">
+  <div class="container">
+    <div class="panel" data-reveal>
+      <div class="panel__copy">
+        <span class="tag">Contacto</span>
+        <h2 class="section-title" id="contacto-titulo">¿Tienes una figura en mente?</h2>
+        <p class="lead">
+          Inmortaliza a tu personaje favorito en una obra de arte única. Escríbenos con una foto o referencia y te
+          enviamos la cotización.
+        </p>
+      </div>
+
+      <ul class="canales">
+        {
+          canales.map((c) => (
+            <li>
+              <a
+                class={`canal canal--${c.id}`}
+                href={c.href}
+                target={c.externo ? '_blank' : undefined}
+                rel={c.externo ? 'noopener' : undefined}
+                aria-label={c.accion}
+                title={c.accion}
+                data-canal
+              >
+                <span class="canal__icon">
+                  <Icon name={c.icono} size="1.9rem" />
+                </span>
+                <span class="canal__nombre" aria-hidden="true">
+                  {c.nombre}
+                </span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  .panel {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    align-items: center;
+    gap: clamp(2rem, 5vw, 4.5rem);
+    padding: clamp(1.25rem, 5vw, 5rem);
+    border-radius: calc(var(--r-lg) + 0.5rem);
+    border: var(--bw) solid var(--line);
+    background:
+      radial-gradient(70% 90% at 100% 0%, rgb(var(--accent-rgb) / 0.16), transparent 65%),
+      radial-gradient(var(--dot) 1.2px, transparent 1.6px) 0 0 / 18px 18px,
+      var(--bg-raised);
+    box-shadow: var(--shadow-card);
+  }
+
+  :global([data-theme='play']) .panel {
+    background:
+      radial-gradient(rgb(43 26 36 / 0.12) 1.4px, transparent 1.8px) 0 0 / 20px 20px,
+      var(--c-lavanda);
+    color: var(--tone-ink);
+  }
+
+  :global([data-theme='play']) .panel .lead {
+    color: var(--tone-ink);
+  }
+
+  :global([data-theme='play']) .panel .tag {
+    background: var(--surface);
+  }
+
+  .panel__copy {
+    display: grid;
+    justify-items: start;
+    gap: 1.25rem;
+  }
+
+  /* ── Botones con el logo de cada red ── */
+  .canales {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: clamp(0.75rem, 2vw, 1rem);
+  }
+
+  .canal {
+    /* Color del brillo; cada tema lo ajusta */
+    --brillo: var(--accent-rgb);
+    position: relative;
+    display: grid;
+    justify-items: center;
+    gap: 0.75rem;
+    padding: clamp(1.25rem, 3vw, 1.75rem) 1rem;
+    border-radius: var(--r-lg);
+    border: var(--bw) solid var(--line-strong);
+    background: var(--surface);
+    transition:
+      transform 0.5s var(--ease-spring),
+      border-color 0.3s var(--ease-out),
+      box-shadow 0.5s var(--ease-spring);
+  }
+
+  .canal:hover,
+  .canal:focus-visible {
+    transform: translateY(-4px);
+    border-color: rgb(var(--brillo));
+    box-shadow: 0 14px 40px -14px rgb(var(--brillo) / 0.75);
+  }
+
+  .canal:active {
+    transform: scale(0.96);
+  }
+
+  .canal__icon {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 4rem;
+    height: 4rem;
+    border-radius: 999px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    transition:
+      transform 0.5s var(--ease-spring),
+      background-color 0.3s var(--ease-out),
+      color 0.3s var(--ease-out);
+  }
+
+  .canal:hover .canal__icon,
+  .canal:focus-visible .canal__icon {
+    background: var(--accent);
+    color: var(--accent-ink);
+    transform: scale(1.06);
+  }
+
+  .canal__nombre {
+    font-family: var(--font-display);
+    font-weight: var(--display-weight);
+    font-size: 1.05rem;
+    letter-spacing: -0.02em;
+  }
+
+  /* Anillo que se expande al hacer clic */
+  .canal__icon::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    border: 2px solid rgb(var(--brillo));
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .canal.is-brillo {
+    animation: canal-brillo 0.9s var(--ease-out);
+  }
+
+  .canal.is-brillo .canal__icon {
+    animation: icono-salto 0.6s var(--ease-spring);
+  }
+
+  .canal.is-brillo .canal__icon::after {
+    animation: anillo 0.8s var(--ease-out);
+  }
+
+  @keyframes canal-brillo {
+    30% {
+      box-shadow:
+        0 0 0 4px rgb(var(--brillo) / 0.35),
+        0 0 48px 6px rgb(var(--brillo) / 0.7);
+    }
+  }
+
+  @keyframes icono-salto {
+    40% {
+      transform: scale(1.22) rotate(-6deg);
+    }
+  }
+
+  @keyframes anillo {
+    from {
+      opacity: 0.9;
+      transform: scale(1);
+    }
+    to {
+      opacity: 0;
+      transform: scale(2.1);
+    }
+  }
+
+  /* Tema de colores: cada red con su pastel */
+  :global([data-theme='play']) .canal {
+    border-color: var(--line);
+    box-shadow: 4px 4px 0 var(--line);
+    color: var(--tone-ink);
+  }
+
+  :global([data-theme='play']) .canal:hover,
+  :global([data-theme='play']) .canal:focus-visible {
+    transform: translate(-2px, -2px);
+    box-shadow: 7px 7px 0 var(--line);
+  }
+
+  :global([data-theme='play']) .canal__icon,
+  :global([data-theme='play']) .canal:hover .canal__icon {
+    border: var(--bw) solid var(--line);
+    color: var(--tone-ink);
+  }
+
+  :global([data-theme='play']) .canal--wa {
+    --brillo: 111 216 189;
+  }
+  :global([data-theme='play']) .canal--wa .canal__icon {
+    background: var(--c-menta);
+  }
+
+  :global([data-theme='play']) .canal--ig {
+    --brillo: 255 134 170;
+  }
+  :global([data-theme='play']) .canal--ig .canal__icon {
+    background: var(--c-chicle);
+  }
+
+  :global([data-theme='play']) .canal--fb {
+    --brillo: 255 209 102;
+  }
+  :global([data-theme='play']) .canal--fb .canal__icon {
+    background: var(--c-amarillo);
+  }
+
+  :global([data-theme='play']) .canal--mail {
+    --brillo: 184 166 255;
+  }
+  :global([data-theme='play']) .canal--mail .canal__icon {
+    background: var(--c-rosa);
+  }
+
+  :global([data-theme='play']) .canal.is-brillo {
+    animation-name: canal-brillo-play;
+  }
+
+  @keyframes canal-brillo-play {
+    30% {
+      box-shadow:
+        7px 7px 0 var(--line),
+        0 0 0 6px rgb(var(--brillo) / 0.55),
+        0 0 44px 8px rgb(var(--brillo) / 0.8);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .canal.is-brillo .canal__icon,
+    .canal.is-brillo .canal__icon::after {
+      animation: none;
+    }
+  }
+
+  @media (max-width: 860px) {
+    .panel {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 420px) {
+    .canal__icon {
+      width: 3.4rem;
+      height: 3.4rem;
+    }
+
+    .canal__nombre {
+      font-size: 0.95rem;
+    }
+  }
+</style>
+
+<script>
+  // Al tocar un botón se ilumina antes de abrir la red
+  document.querySelectorAll<HTMLAnchorElement>('[data-canal]').forEach((canal) => {
+    canal.addEventListener('click', () => {
+      canal.classList.remove('is-brillo');
+      void canal.offsetWidth; // reinicia la animación si se toca varias veces
+      canal.classList.add('is-brillo');
+    });
+    canal.addEventListener('animationend', (e) => {
+      if (e.target === canal) canal.classList.remove('is-brillo');
+    });
+  });
+</script>

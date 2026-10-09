@@ -1,0 +1,82 @@
+---
+import { enlaceWhatsApp } from '../config/sitio';
+import Icon from './Icon.astro';
+---
+
+<a
+  class="fab"
+  href={enlaceWhatsApp()}
+  target="_blank"
+  rel="noopener"
+  aria-label="Cotiza por WhatsApp"
+  title="Cotiza por WhatsApp"
+  data-fab
+>
+  <Icon name="whatsapp" size="1.75rem" />
+</a>
+
+<style>
+  .fab {
+    position: fixed;
+    right: clamp(1rem, 3vw, 1.75rem);
+    /* Respeta la barra de inicio de los iPhone */
+    bottom: calc(clamp(1rem, 3vw, 1.75rem) + env(safe-area-inset-bottom, 0px));
+    z-index: var(--z-fab);
+    display: grid;
+    place-items: center;
+    width: 3.75rem;
+    height: 3.75rem;
+    border-radius: 999px;
+    background: var(--accent);
+    color: var(--accent-ink);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.3),
+      0 16px 32px -12px rgb(0 0 0 / 0.6);
+    transition:
+      transform 0.5s var(--ease-spring),
+      opacity 0.4s var(--ease-out);
+  }
+
+  .fab:hover {
+    transform: scale(1.06);
+  }
+
+  .fab:active {
+    transform: scale(0.96);
+  }
+
+  /* Se oculta mientras la portada está a la vista */
+  .fab.is-hidden {
+    opacity: 0;
+    transform: translateY(1rem) scale(0.9);
+    pointer-events: none;
+  }
+
+  :global([data-theme='play']) .fab {
+    background: var(--c-menta);
+    color: var(--tone-ink);
+    border: var(--bw) solid var(--line);
+    box-shadow: 4px 4px 0 var(--line);
+  }
+</style>
+
+<script>
+  const fab = document.querySelector<HTMLElement>('[data-fab]')!;
+  const portada = document.querySelector('#inicio');
+  const contacto = document.querySelector('#contacto');
+
+  if (portada && 'IntersectionObserver' in window) {
+    const visibles = new Set<Element>();
+    const observer = new IntersectionObserver(
+      (entradas) => {
+        entradas.forEach((e) => (e.isIntersecting ? visibles.add(e.target) : visibles.delete(e.target)));
+        const ocultar = visibles.size > 0;
+        fab.classList.toggle('is-hidden', ocultar);
+        fab.toggleAttribute('inert', ocultar);
+      },
+      { threshold: 0.25 },
+    );
+    observer.observe(portada);
+    if (contacto) observer.observe(contacto);
+  }
+</script>

@@ -1,0 +1,251 @@
+---
+import type { IconName } from '../lib/iconos';
+import Icon from './Icon.astro';
+import VideoProceso from './VideoProceso.astro';
+
+const pasos: { titulo: string; texto: string; icono: IconName }[] = [
+  {
+    titulo: 'Cuéntanos tu idea',
+    texto: 'Envíanos una foto, un dibujo o el enlace del personaje o pieza que quieres.',
+    icono: 'chat-circle-text',
+  },
+  {
+    titulo: 'Modelamos',
+    texto: 'Ajustamos el diseño 3D y te confirmamos tamaño, colores, tiempo y precio.',
+    icono: 'cube',
+  },
+  {
+    titulo: 'Imprimimos',
+    texto: 'La pieza se fabrica capa por capa con el material que mejor le queda.',
+    icono: 'printer',
+  },
+  {
+    titulo: 'Pintura y entrega',
+    texto: 'Pintamos a mano cada detalle y la recibes lista para exhibir o regalar.',
+    icono: 'package',
+  },
+];
+---
+
+<section class="section proceso" id="proceso" aria-labelledby="proceso-titulo">
+  <div class="container">
+    <header class="head" data-reveal>
+      <h2 class="section-title" id="proceso-titulo">Cómo encargar tu figura</h2>
+      <p class="lead">Sin complicaciones: hablas con nosotros y te acompañamos hasta que la tengas en tus manos.</p>
+    </header>
+
+    <div class="linea" data-reveal>
+      <span class="linea__filamento" aria-hidden="true"></span>
+      <ol class="pasos">
+      {
+        pasos.map((p, i) => (
+          <li class="paso" style={`--i:${i}`}>
+            <span class="paso__nodo">
+              <Icon name={p.icono} size="1.5rem" />
+            </span>
+            <h3 class="paso__titulo">{p.titulo}</h3>
+            <p class="paso__texto">{p.texto}</p>
+          </li>
+        ))
+      }
+      </ol>
+    </div>
+
+    <VideoProceso />
+  </div>
+</section>
+
+<style>
+  .head {
+    display: grid;
+    justify-items: center;
+    gap: 1.1rem;
+    text-align: center;
+    margin-bottom: clamp(3rem, 6vw, 5rem);
+  }
+
+  .head .lead {
+    max-width: 50ch;
+  }
+
+  .linea {
+    position: relative;
+  }
+
+  .pasos {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: clamp(1.5rem, 3vw, 2.5rem);
+  }
+
+  /* El "filamento" que une los pasos se dibuja al aparecer */
+  .linea__filamento {
+    position: absolute;
+    top: 2rem;
+    left: 2rem;
+    right: 2rem;
+    height: 2px;
+    background: linear-gradient(to right, var(--accent), var(--line-strong));
+    transform-origin: left;
+  }
+
+  :global([data-theme='play']) .linea__filamento {
+    height: 4px;
+    margin-top: -1px;
+    border-radius: 4px;
+    background: repeating-linear-gradient(
+      to right,
+      var(--c-rosa) 0 18px,
+      var(--c-amarillo) 18px 36px,
+      var(--c-menta) 36px 54px,
+      var(--c-lavanda) 54px 72px
+    );
+  }
+
+  .paso {
+    position: relative;
+    display: grid;
+    align-content: start;
+    gap: 0.75rem;
+  }
+
+  .paso__nodo {
+    display: grid;
+    place-items: center;
+    width: 4rem;
+    height: 4rem;
+    margin-bottom: 0.75rem;
+    border-radius: 999px;
+    border: var(--bw) solid var(--line-strong);
+    background: var(--bg);
+    color: var(--accent);
+    box-shadow:
+      0 0 0 6px var(--bg),
+      inset 0 1px 0 rgb(255 255 255 / 0.06);
+  }
+
+  .paso:first-child .paso__nodo {
+    background: var(--accent);
+    color: var(--accent-ink);
+    border-color: var(--accent);
+  }
+
+  :global([data-theme='play']) .paso__nodo {
+    border-color: var(--line);
+    color: var(--tone-ink);
+    background: var(--surface);
+    box-shadow:
+      0 0 0 6px var(--bg),
+      3px 3px 0 6px var(--bg),
+      3px 3px 0 var(--line);
+  }
+
+  :global([data-theme='play']) .paso:nth-child(1) .paso__nodo {
+    background: var(--c-rosa);
+  }
+  :global([data-theme='play']) .paso:nth-child(2) .paso__nodo {
+    background: var(--c-amarillo);
+  }
+  :global([data-theme='play']) .paso:nth-child(3) .paso__nodo {
+    background: var(--c-menta);
+  }
+  :global([data-theme='play']) .paso:nth-child(4) .paso__nodo {
+    background: var(--c-lavanda);
+  }
+
+  .paso__titulo {
+    font-size: var(--fs-h3);
+  }
+
+  .paso__texto {
+    color: var(--muted);
+    font-size: var(--fs-sm);
+    max-width: 30ch;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    :global(.js) .linea .linea__filamento {
+      transform: scaleX(0);
+      transition: transform 1.6s var(--ease-out) 0.2s;
+    }
+
+    :global(.js) .linea.is-visible .linea__filamento {
+      transform: scaleX(1);
+    }
+
+    :global(.js) .linea .paso {
+      opacity: 0;
+      transform: translateY(16px);
+      transition:
+        opacity 0.7s var(--ease-out),
+        transform 0.7s var(--ease-out);
+      transition-delay: calc(0.3s + var(--i) * 0.25s);
+    }
+
+    :global(.js) .linea.is-visible .paso {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* En pantallas pequeñas la línea pasa a ser vertical */
+  @media (max-width: 860px) {
+    .pasos {
+      grid-template-columns: 1fr;
+      gap: 2.25rem;
+    }
+
+    .linea__filamento {
+      top: 2rem;
+      bottom: 2rem;
+      left: 2rem;
+      right: auto;
+      width: 2px;
+      height: auto;
+      background: linear-gradient(to bottom, var(--accent), var(--line-strong));
+      transform-origin: top;
+    }
+
+    :global([data-theme='play']) .linea__filamento {
+      width: 4px;
+      height: auto;
+      margin-top: 0;
+      margin-left: -1px;
+      background: repeating-linear-gradient(
+        to bottom,
+        var(--c-rosa) 0 18px,
+        var(--c-amarillo) 18px 36px,
+        var(--c-menta) 36px 54px,
+        var(--c-lavanda) 54px 72px
+      );
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      :global(.js) .linea .linea__filamento {
+        transform: scaleY(0);
+      }
+
+      :global(.js) .linea.is-visible .linea__filamento {
+        transform: scaleY(1);
+      }
+    }
+
+    .paso {
+      grid-template-columns: 4rem 1fr;
+      column-gap: 1.25rem;
+      row-gap: 0.4rem;
+    }
+
+    .paso__nodo {
+      grid-row: 1 / span 2;
+      margin-bottom: 0;
+    }
+
+    .paso__titulo {
+      align-self: end;
+      padding-top: 0.6rem;
+    }
+  }
+</style>

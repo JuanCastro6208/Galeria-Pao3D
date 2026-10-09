@@ -1,0 +1,7 @@
+Coloca aquí las fotos de tus figuras (jpg, png, webp o avif).
+
+Después agrega cada foto en src/data/figuras.ts usando el nombre exacto del archivo,
+por ejemplo:  imagen: 'dragon-rojo.jpg'
+
+No hace falta reducirlas: al compilar la página se optimizan solas.
+Recomendado: fotos de al menos 1200 px de ancho, bien iluminadas y con fondo limpio.

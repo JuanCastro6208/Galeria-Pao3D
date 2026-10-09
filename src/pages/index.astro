@@ -1,0 +1,26 @@
+---
+import Categorias from '../components/Categorias.astro';
+import Contacto from '../components/Contacto.astro';
+import Fondo from '../components/Fondo.astro';
+import Footer from '../components/Footer.astro';
+import Galeria from '../components/Galeria.astro';
+import Header from '../components/Header.astro';
+import Hero from '../components/Hero.astro';
+import Proceso from '../components/Proceso.astro';
+import WhatsAppFlotante from '../components/WhatsAppFlotante.astro';
+import Base from '../layouts/Base.astro';
+---
+
+<Base>
+  <Fondo />
+  <Header />
+  <main id="contenido">
+    <Hero />
+    <Categorias />
+    <Galeria />
+    <Proceso />
+    <Contacto />
+  </main>
+  <Footer />
+  <WhatsAppFlotante />
+</Base>

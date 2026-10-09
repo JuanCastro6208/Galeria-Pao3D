@@ -1,0 +1,168 @@
+---
+import '@fontsource-variable/geist';
+import '@fontsource-variable/geist-mono';
+import '@fontsource-variable/bricolage-grotesque';
+import '../styles/global.css';
+import { getImage } from 'astro:assets';
+import logoCirculo from '../assets/marca/logo-circulo.png';
+import { enlaceFacebook, enlaceInstagram, idYouTube, nombreCompleto, sitio, urlAbsoluta, urlPendiente } from '../config/sitio';
+
+interface Props {
+  title?: string;
+  description?: string;
+  /** true en páginas que Google no debe mostrar (ej: la 404). */
+  noindex?: boolean;
+}
+
+const { title = sitio.tituloSeo, description = sitio.descripcion, noindex = false } = Astro.props;
+
+if (urlPendiente && import.meta.env.PROD) {
+  console.warn(
+    '\n[SEO] `url` en src/config/sitio.ts sigue siendo la de ejemplo. Cámbiala por la dirección real antes de publicar.\n',
+  );
+}
+
+const canonical = urlAbsoluta(Astro.url.pathname);
+const imagenSocial = urlAbsoluta('/og.jpg');
+const logo = await getImage({ src: logoCirculo, width: 512, format: 'png' });
+
+// Datos estructurados: le explican a Google quién es el negocio y qué hace.
+// Por decisión de la marca no se incluyen el teléfono ni el correo.
+const negocio = {
+  '@type': sitio.ciudad ? 'LocalBusiness' : 'Organization',
+  '@id': urlAbsoluta('/#negocio'),
+  name: nombreCompleto,
+  alternateName: `${sitio.nombre} ${sitio.sufijo}`,
+  slogan: sitio.eslogan,
+  description: sitio.descripcion,
+  url: urlAbsoluta('/'),
+  logo: urlAbsoluta(logo.src),
+  image: imagenSocial,
+  sameAs: [enlaceInstagram, enlaceFacebook],
+  knowsAbout: sitio.servicios,
+  areaServed: { '@type': 'Country', name: 'Colombia' },
+  ...(sitio.ciudad
+    ? { address: { '@type': 'PostalAddress', addressLocality: sitio.ciudad, addressCountry: sitio.pais } }
+    : {}),
+};
+
+const idVideo = idYouTube(sitio.video.youtube);
+const portadaVideo = idVideo
+  ? `https://i.ytimg.com/vi/${idVideo}/hqdefault.jpg`
+  : sitio.video.portada && urlAbsoluta(`/videos/${sitio.video.portada}`);
+const video = (idVideo || sitio.video.archivo) &&
+  sitio.video.fecha &&
+  portadaVideo && {
+    '@type': 'VideoObject',
+    name: sitio.video.titulo,
+    description: sitio.video.descripcion,
+    thumbnailUrl: portadaVideo,
+    uploadDate: sitio.video.fecha,
+    ...(idVideo
+      ? { embedUrl: `https://www.youtube.com/embed/${idVideo}` }
+      : { contentUrl: urlAbsoluta(`/videos/${sitio.video.archivo}`) }),
+    publisher: { '@id': negocio['@id'] },
+  };
+
+const datosEstructurados = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    negocio,
+    {
+      '@type': 'WebSite',
+      '@id': urlAbsoluta('/#sitio'),
+      url: urlAbsoluta('/'),
+      name: nombreCompleto,
+      inLanguage: 'es-CO',
+      publisher: { '@id': negocio['@id'] },
+    },
+    ...(video ? [video] : []),
+  ],
+};
+---
+
+<!doctype html>
+<html lang="es-CO" data-theme="tech">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta
+      name="robots"
+      content={noindex ? 'noindex, follow' : 'index, follow, max-image-preview:large, max-video-preview:-1'}
+    />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
+    <meta name="theme-color" content="#0d0b0c" />
+    <meta name="author" content={nombreCompleto} />
+    <meta name="generator" content={Astro.generator} />
+
+    <!-- Vista previa al compartir el enlace (WhatsApp, Facebook, Instagram, X) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="es_CO" />
+    <meta property="og:site_name" content={nombreCompleto} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={imagenSocial} />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={`${nombreCompleto}: ${sitio.eslogan}`} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={imagenSocial} />
+    <meta name="twitter:image:alt" content={`${nombreCompleto}: ${sitio.eslogan}`} />
+
+    {!noindex && <script type="application/ld+json" set:html={JSON.stringify(datosEstructurados)} />}
+
+    <!-- Aplica el tema guardado antes de pintar para evitar parpadeos -->
+    <script is:inline>
+      (function () {
+        var tema = 'tech';
+        try {
+          var guardado = localStorage.getItem('tema');
+          if (guardado === 'play' || guardado === 'tech') tema = guardado;
+        } catch (e) {}
+        // Un enlace con ?tema=play o ?tema=tech fuerza ese estilo
+        var enUrl = new URLSearchParams(location.search).get('tema');
+        if (enUrl === 'play' || enUrl === 'tech') tema = enUrl;
+        var root = document.documentElement;
+        root.dataset.theme = tema;
+        root.classList.add('js');
+        var meta = document.querySelector('meta[name="theme-color"]');
+        if (meta) meta.setAttribute('content', tema === 'play' ? '#fff3f3' : '#0d0b0c');
+      })();
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#contenido">Saltar al contenido</a>
+    <slot />
+
+    <script>
+      // Aparición suave de los elementos marcados con data-reveal
+      const elementos = document.querySelectorAll<HTMLElement>('[data-reveal]');
+      if ('IntersectionObserver' in window) {
+        const observer = new IntersectionObserver(
+          (entradas) => {
+            for (const entrada of entradas) {
+              if (entrada.isIntersecting) {
+                entrada.target.classList.add('is-visible');
+                observer.unobserve(entrada.target);
+              }
+            }
+          },
+          { rootMargin: '0px 0px -8% 0px', threshold: 0.12 },
+        );
+        elementos.forEach((el) => observer.observe(el));
+      } else {
+        elementos.forEach((el) => el.classList.add('is-visible'));
+      }
+    </script>
+  </body>
+</html>

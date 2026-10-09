@@ -1,0 +1,440 @@
+---
+import { categorias } from '../data/categorias';
+import { figuras } from '../data/figuras';
+import FiguraCard from './FiguraCard.astro';
+import Icon from './Icon.astro';
+
+const filtros = [{ id: 'todas', nombre: 'Todas' }, ...categorias.map((c) => ({ id: c.id, nombre: c.nombre }))];
+---
+
+<section class="section galeria" id="galeria" aria-labelledby="galeria-titulo">
+  <div class="container">
+    <header class="head" data-reveal>
+      <h2 class="section-title" id="galeria-titulo">Trabajos realizados</h2>
+      <p class="lead">Cada pieza se imprime y se pinta a pedido. Filtra por categoría y toca una foto para verla en grande.</p>
+    </header>
+
+    <div class="filtros" role="group" aria-label="Filtrar por categoría" data-reveal>
+      {
+        filtros.map((f, i) => (
+          <button type="button" class="filtro" data-filtro={f.id} aria-pressed={i === 0 ? 'true' : 'false'}>
+            {f.nombre}
+          </button>
+        ))
+      }
+    </div>
+    <p class="sr-only" aria-live="polite" data-conteo></p>
+
+    <ul class="grid" data-grid>
+      {figuras.map((figura, indice) => <FiguraCard figura={figura} indice={indice} />)}
+    </ul>
+
+    <div class="vacio" data-vacio hidden>
+      <Icon name="cube" size="2rem" />
+      <p>Pronto habrá trabajos en esta categoría. Escríbenos y la tuya puede ser la primera.</p>
+    </div>
+  </div>
+
+  <dialog class="lightbox" data-visor aria-label="Visor de fotos">
+    <div class="lightbox__frame">
+      <div class="lightbox__media" data-visor-media></div>
+      <div class="lightbox__info">
+        <p class="lightbox__titulo" data-visor-titulo></p>
+        <p class="lightbox__desc" data-visor-desc></p>
+        <p class="lightbox__detalle" data-visor-detalle></p>
+      </div>
+    </div>
+    <button type="button" class="lb-btn lb-btn--cerrar" data-visor-cerrar aria-label="Cerrar">
+      <Icon name="x" size="1.3rem" />
+    </button>
+    <button type="button" class="lb-btn lb-btn--prev" data-visor-prev aria-label="Foto anterior">
+      <Icon name="caret-left" size="1.3rem" />
+    </button>
+    <button type="button" class="lb-btn lb-btn--next" data-visor-next aria-label="Foto siguiente">
+      <Icon name="caret-right" size="1.3rem" />
+    </button>
+  </dialog>
+</section>
+
+<style>
+  .head {
+    display: grid;
+    gap: 1.1rem;
+    margin-bottom: 2rem;
+  }
+
+  /* Filtros desplazables en móvil */
+  .filtros {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: clamp(2rem, 4vw, 3rem);
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding: 0.25rem 0.4rem 0.5rem 0.1rem;
+    margin-inline: -0.1rem;
+  }
+
+  .filtros::-webkit-scrollbar {
+    display: none;
+  }
+
+  .filtro {
+    flex-shrink: 0;
+    padding: 0.65rem 1.15rem;
+    border-radius: 999px;
+    border: var(--bw) solid var(--line-strong);
+    background: var(--bg-raised);
+    color: var(--muted);
+    font-size: var(--fs-sm);
+    font-weight: 500;
+    white-space: nowrap;
+    transition:
+      color 0.25s var(--ease-out),
+      background-color 0.25s var(--ease-out),
+      border-color 0.25s var(--ease-out),
+      transform 0.4s var(--ease-spring);
+  }
+
+  .filtro:hover {
+    color: var(--text);
+    border-color: var(--accent);
+  }
+
+  .filtro:active {
+    transform: scale(0.97);
+  }
+
+  .filtro[aria-pressed='true'] {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--accent-ink);
+    font-weight: 600;
+  }
+
+  :global([data-theme='play']) .filtro {
+    border-color: var(--line);
+    color: var(--text);
+  }
+
+  :global([data-theme='play']) .filtro[aria-pressed='true'] {
+    background: var(--c-amarillo);
+    border-color: var(--line);
+    box-shadow: 3px 3px 0 var(--line);
+  }
+
+  /* Filas alineadas de tarjetas iguales; la última fila incompleta queda centrada */
+  .grid {
+    --cols: 3;
+    --gap: clamp(1rem, 2vw, 1.5rem);
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    column-gap: var(--gap);
+    row-gap: clamp(1.5rem, 2.5vw, 2rem);
+  }
+
+  .grid > :global(.item) {
+    width: calc((100% - (var(--cols) - 1) * var(--gap)) / var(--cols));
+  }
+
+  .vacio {
+    display: grid;
+    justify-items: center;
+    gap: 0.75rem;
+    padding: 3rem 1rem;
+    text-align: center;
+    color: var(--muted);
+    border: var(--bw) dashed var(--line-strong);
+    border-radius: var(--r-lg);
+  }
+
+  .vacio[hidden] {
+    display: none;
+  }
+
+  .vacio :global(.icon) {
+    color: var(--accent);
+  }
+
+  /* 4 columnas en pantallas grandes, 3 en computador y tablet, 2 en celular */
+  @media (min-width: 1680px) {
+    .grid {
+      --cols: 4;
+    }
+  }
+
+  @media (max-width: 760px) {
+    .grid {
+      --cols: 2;
+    }
+  }
+
+  /* En móvil: dos columnas uniformes para no alargar demasiado la página */
+  @media (max-width: 640px) {
+    .grid {
+      --gap: 0.75rem;
+      row-gap: 1.5rem;
+    }
+
+    .grid :global(.card__media) {
+      border-radius: var(--r-md);
+    }
+
+    .grid :global(.card) {
+      gap: 0.6rem;
+    }
+
+    .grid :global(.card__title) {
+      font-size: 0.95rem;
+    }
+
+    .grid :global(.card__media--vacia span) {
+      font-size: var(--fs-xs);
+    }
+  }
+
+  /* ── Visor de fotos ───────────────────────────────────── */
+  .lightbox {
+    width: 100%;
+    max-width: 100%;
+    height: 100%;
+    max-height: 100%;
+    margin: 0;
+    padding: clamp(1rem, 4vw, 3rem);
+    border: 0;
+    background: transparent;
+    color: var(--text);
+  }
+
+  .lightbox[open] {
+    display: grid;
+    place-items: center;
+  }
+
+  .lightbox::backdrop {
+    background: rgb(var(--bg-rgb) / 0.88);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+  }
+
+  :global([data-theme='play']) .lightbox::backdrop {
+    background: rgb(var(--bg-rgb) / 0.94);
+  }
+
+  .lightbox__frame {
+    display: grid;
+    gap: 1rem;
+    max-width: min(68rem, 100%);
+    max-height: 100%;
+  }
+
+  .lightbox__media {
+    display: grid;
+    place-items: center;
+  }
+
+  .lightbox__media :global(img) {
+    max-width: 100%;
+    max-height: calc(100dvh - 12rem);
+    margin-inline: auto;
+    object-fit: contain;
+    border-radius: var(--r-md);
+    border: var(--bw) solid var(--line);
+  }
+
+  .lightbox__info {
+    text-align: center;
+    display: grid;
+    gap: 0.25rem;
+  }
+
+  .lightbox__titulo {
+    font-family: var(--font-display);
+    font-weight: var(--display-weight);
+    font-size: var(--fs-h3);
+    letter-spacing: -0.02em;
+  }
+
+  .lightbox__desc {
+    color: var(--muted);
+  }
+
+  .lightbox__detalle {
+    font-family: var(--font-label);
+    font-size: var(--fs-xs);
+    color: var(--muted);
+  }
+
+  .lb-btn {
+    position: fixed;
+    display: grid;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 999px;
+    background: var(--surface-2);
+    border: var(--bw) solid var(--line-strong);
+    color: var(--text);
+    transition:
+      transform 0.4s var(--ease-spring),
+      background-color 0.25s var(--ease-out);
+  }
+
+  .lb-btn:hover {
+    background: var(--accent);
+    color: var(--accent-ink);
+  }
+
+  .lb-btn:active {
+    transform: scale(0.94);
+  }
+
+  .lb-btn[hidden] {
+    display: none;
+  }
+
+  :global([data-theme='play']) .lb-btn {
+    background: var(--surface);
+    border-color: var(--line);
+    box-shadow: 3px 3px 0 var(--line);
+  }
+
+  :global([data-theme='play']) .lb-btn:hover {
+    background: var(--c-amarillo);
+  }
+
+  .lb-btn--cerrar {
+    top: 1rem;
+    right: 1rem;
+  }
+
+  .lb-btn--prev,
+  .lb-btn--next {
+    top: 50%;
+    margin-top: -1.5rem;
+  }
+
+  .lb-btn--prev {
+    left: 1rem;
+  }
+
+  .lb-btn--next {
+    right: 1rem;
+  }
+
+  @media (max-width: 640px) {
+    .lb-btn--prev,
+    .lb-btn--next {
+      top: auto;
+      bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
+      margin-top: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .lightbox[open] .lightbox__frame {
+      animation: visor-entrada 0.5s var(--ease-out);
+    }
+  }
+
+  @keyframes visor-entrada {
+    from {
+      opacity: 0;
+      transform: scale(0.96) translateY(10px);
+    }
+  }
+</style>
+
+<script>
+  const seccion = document.querySelector<HTMLElement>('#galeria')!;
+  const botonesFiltro = seccion.querySelectorAll<HTMLButtonElement>('[data-filtro]');
+  const items = seccion.querySelectorAll<HTMLLIElement>('[data-grid] > li');
+  const vacio = seccion.querySelector<HTMLElement>('[data-vacio]')!;
+  const conteo = seccion.querySelector<HTMLElement>('[data-conteo]')!;
+
+  // ── Filtros ──
+  function filtrar(id: string) {
+    let visibles = 0;
+    botonesFiltro.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.filtro === id)));
+    items.forEach((item) => {
+      const mostrar = id === 'todas' || item.dataset.categoria === id;
+      item.hidden = !mostrar;
+      if (mostrar) {
+        visibles++;
+        item.classList.add('is-visible');
+      }
+    });
+    vacio.hidden = visibles > 0;
+    conteo.textContent = `${visibles} ${visibles === 1 ? 'trabajo' : 'trabajos'}`;
+  }
+
+  botonesFiltro.forEach((b) => b.addEventListener('click', () => filtrar(b.dataset.filtro!)));
+
+  // Las tarjetas de "Lo que imprimimos" llevan a la galería ya filtrada
+  document.querySelectorAll<HTMLAnchorElement>('[data-ir-filtro]').forEach((enlace) => {
+    enlace.addEventListener('click', () => filtrar(enlace.dataset.irFiltro!));
+  });
+
+  // ── Visor ──
+  const visor = seccion.querySelector<HTMLDialogElement>('[data-visor]')!;
+  // La imagen del visor se crea aquí; su foto se asigna al abrirlo
+  const img = document.createElement('img');
+  img.className = 'lightbox__img';
+  img.decoding = 'async';
+  visor.querySelector('[data-visor-media]')!.append(img);
+  const titulo = visor.querySelector<HTMLElement>('[data-visor-titulo]')!;
+  const desc = visor.querySelector<HTMLElement>('[data-visor-desc]')!;
+  const detalle = visor.querySelector<HTMLElement>('[data-visor-detalle]')!;
+  const prev = visor.querySelector<HTMLButtonElement>('[data-visor-prev]')!;
+  const next = visor.querySelector<HTMLButtonElement>('[data-visor-next]')!;
+  let actual = 0;
+
+  // Todas las fotos de las figuras visibles, en orden (una figura puede tener varias)
+  type Foto = { src: string; boton: HTMLButtonElement; n: number; total: number };
+
+  function fotosVisibles(): Foto[] {
+    return [...seccion.querySelectorAll<HTMLButtonElement>('[data-lightbox]')]
+      .filter((b) => !b.closest<HTMLLIElement>('li')!.hidden)
+      .flatMap((boton) => {
+        const srcs: string[] = JSON.parse(boton.dataset.fotos ?? '[]');
+        return srcs.map((src, n) => ({ src, boton, n, total: srcs.length }));
+      });
+  }
+
+  function mostrar(indice: number) {
+    const fotos = fotosVisibles();
+    if (!fotos.length) return;
+    actual = (indice + fotos.length) % fotos.length;
+    const { src, boton, n, total } = fotos[actual];
+    img.src = src;
+    img.alt = total > 1 ? `${boton.dataset.titulo}, foto ${n + 1} de ${total}` : boton.dataset.titulo!;
+    titulo.textContent = boton.dataset.titulo!;
+    desc.textContent = boton.dataset.descripcion ?? '';
+    desc.hidden = !boton.dataset.descripcion;
+    detalle.textContent = boton.dataset.detalle ?? '';
+    prev.hidden = next.hidden = fotos.length < 2;
+  }
+
+  seccion.addEventListener('click', (e) => {
+    const disparador = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-lightbox]');
+    if (!disparador) return;
+    mostrar(fotosVisibles().findIndex((f) => f.boton === disparador));
+    visor.showModal();
+  });
+
+  prev.addEventListener('click', () => mostrar(actual - 1));
+  next.addEventListener('click', () => mostrar(actual + 1));
+  visor.querySelector('[data-visor-cerrar]')!.addEventListener('click', () => visor.close());
+
+  // Cerrar al tocar fuera de la foto
+  visor.addEventListener('click', (e) => {
+    if (e.target === visor) visor.close();
+  });
+
+  visor.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft') mostrar(actual - 1);
+    if (e.key === 'ArrowRight') mostrar(actual + 1);
+  });
+</script>

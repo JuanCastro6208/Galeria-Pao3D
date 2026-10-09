@@ -1,0 +1,176 @@
+---
+// Video "Así trabajamos". Solo aparece si en src/config/sitio.ts hay un enlace
+// de YouTube o un archivo en public/videos/. YouTube se carga al tocar el botón
+// de reproducir, para que la página siga abriendo rápido.
+import { idYouTube, sitio } from '../config/sitio';
+import Icon from './Icon.astro';
+
+const { video } = sitio;
+const id = idYouTube(video.youtube);
+const archivo = !id && video.archivo ? `/videos/${video.archivo}` : undefined;
+const portada = id ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg` : video.portada && `/videos/${video.portada}`;
+const hayVideo = Boolean(id || archivo);
+---
+
+{
+  hayVideo && (
+    <div class:list={['video', { 'video--vertical': video.vertical }]} data-reveal>
+      <div class="video__texto">
+        <span class="tag">Detrás de cámaras</span>
+        <h3 class="video__titulo">{video.titulo}</h3>
+        <p class="video__desc">{video.descripcion}</p>
+      </div>
+
+      <div class="video__marco">
+        {id ? (
+          <button
+            type="button"
+            class="video__poster"
+            data-youtube={id}
+            data-titulo={video.titulo}
+            aria-label={`Reproducir video: ${video.titulo}`}
+          >
+            <img src={portada} alt="" loading="lazy" decoding="async" width="480" height="360" />
+            <span class="video__play" aria-hidden="true">
+              <Icon name="play" size="1.6rem" />
+            </span>
+          </button>
+        ) : (
+          <video controls playsinline preload="none" poster={portada || undefined} aria-label={video.titulo}>
+            <source src={archivo} type={archivo?.endsWith('.webm') ? 'video/webm' : 'video/mp4'} />
+          </video>
+        )}
+      </div>
+    </div>
+  )
+}
+
+<style>
+  .video {
+    display: grid;
+    grid-template-columns: 1fr minmax(0, 1.3fr);
+    align-items: center;
+    gap: clamp(2rem, 5vw, 4rem);
+    margin-top: clamp(3.5rem, 7vw, 6rem);
+  }
+
+  .video--vertical {
+    grid-template-columns: 1fr minmax(0, 22rem);
+    justify-content: center;
+  }
+
+  .video__texto {
+    display: grid;
+    justify-items: start;
+    gap: 1rem;
+  }
+
+  .video__titulo {
+    font-size: var(--fs-h2);
+  }
+
+  .video__desc {
+    color: var(--muted);
+    font-size: var(--fs-lg);
+    max-width: 42ch;
+  }
+
+  .video__marco {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border-radius: var(--r-lg);
+    border: var(--bw) solid var(--line);
+    background: var(--surface);
+    box-shadow: var(--shadow-card);
+  }
+
+  .video--vertical .video__marco {
+    aspect-ratio: 9 / 16;
+    width: 100%;
+    max-height: 80dvh;
+    justify-self: center;
+  }
+
+  .video__marco video,
+  .video__marco :global(iframe),
+  .video__poster,
+  .video__poster img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+
+  .video__marco video {
+    object-fit: cover;
+    background: #000;
+  }
+
+  .video__poster {
+    padding: 0;
+  }
+
+  .video__poster img {
+    object-fit: cover;
+    transition: transform 1s var(--ease-out);
+  }
+
+  .video__poster:hover img {
+    transform: scale(1.04);
+  }
+
+  .video__play {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    display: grid;
+    place-items: center;
+    width: 4.5rem;
+    height: 4.5rem;
+    margin: -2.25rem 0 0 -2.25rem;
+    border-radius: 999px;
+    background: var(--accent);
+    color: var(--accent-ink);
+    box-shadow: 0 0 0 10px rgb(var(--accent-rgb) / 0.25);
+    transition:
+      transform 0.5s var(--ease-spring),
+      box-shadow 0.5s var(--ease-spring);
+  }
+
+  .video__poster:hover .video__play {
+    transform: scale(1.08);
+    box-shadow: 0 0 0 16px rgb(var(--accent-rgb) / 0.2);
+  }
+
+  :global([data-theme='play']) .video__play {
+    border: var(--bw) solid var(--line);
+    box-shadow: 4px 4px 0 var(--line);
+  }
+
+  @media (max-width: 860px) {
+    .video,
+    .video--vertical {
+      grid-template-columns: 1fr;
+    }
+
+    .video--vertical .video__marco {
+      max-width: 22rem;
+    }
+  }
+</style>
+
+<script>
+  // Cambia la portada por el reproductor de YouTube al tocarla
+  document.querySelectorAll<HTMLButtonElement>('[data-youtube]').forEach((boton) => {
+    boton.addEventListener('click', () => {
+      const iframe = document.createElement('iframe');
+      iframe.src = `https://www.youtube-nocookie.com/embed/${boton.dataset.youtube}?autoplay=1&rel=0&playsinline=1`;
+      iframe.title = boton.dataset.titulo ?? 'Video';
+      iframe.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
+      iframe.allowFullscreen = true;
+      boton.replaceWith(iframe);
+    });
+  });
+</script>

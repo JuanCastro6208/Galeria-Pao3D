@@ -1,0 +1,241 @@
+---
+import { getImage, Picture } from 'astro:assets';
+import { categoriaPorId } from '../data/categorias';
+import { altDeFigura, type Figura } from '../data/figuras';
+import { imagenDeFigura } from '../lib/imagenes';
+import Icon from './Icon.astro';
+
+interface Props {
+  figura: Figura;
+  indice: number;
+}
+
+const { figura, indice } = Astro.props;
+const categoria = categoriaPorId(figura.categoria);
+const foto = imagenDeFigura(figura.imagen);
+
+// Versiones grandes para el visor (foto principal + fotos adicionales)
+const fotos = foto
+  ? [foto, ...(figura.masFotos ?? []).map(imagenDeFigura)].filter((f) => f !== undefined)
+  : [];
+const grandes = await Promise.all(
+  fotos.map((f) => getImage({ src: f, width: Math.min(f.width, 1800), format: 'webp' })),
+);
+
+// Todas las tarjetas miden lo mismo. Las fotos horizontales se muestran completas
+// sobre una versión desenfocada de sí mismas, para no cortar la figura.
+const horizontal = foto ? foto.width / foto.height > 1.2 : false;
+const fondo = horizontal && foto ? await getImage({ src: foto, width: 96, format: 'webp' }) : undefined;
+const estilo = [
+  `--i:${indice % 3}`,
+  figura.encuadre && `--encuadre:${figura.encuadre}`,
+  fondo && `--fondo:url(${fondo.src})`,
+]
+  .filter(Boolean)
+  .join(';');
+const detalle = [categoria.nombre, figura.material, figura.tamano].filter(Boolean).join(' / ');
+---
+
+<li class:list={['item', horizontal && 'item--completa']} data-categoria={figura.categoria} data-reveal style={estilo}>
+  <figure class="card">
+    {
+      foto && grandes.length ? (
+        <button
+          type="button"
+          class="card__media"
+          data-lightbox
+          data-fotos={JSON.stringify(grandes.map((g) => g.src))}
+          data-titulo={figura.titulo}
+          data-descripcion={figura.descripcion ?? ''}
+          data-detalle={detalle}
+          aria-label={`Ver en grande: ${figura.titulo}`}
+        >
+          <Picture
+            src={foto}
+            alt={altDeFigura(figura)}
+            formats={['avif', 'webp']}
+            widths={[400, 640, 900]}
+            sizes="(max-width: 1024px) 46vw, 31vw"
+            class="card__img"
+          />
+          <span class="card__zoom" aria-hidden="true">
+            <Icon name="arrow-up-right" size="1.1rem" />
+          </span>
+        </button>
+      ) : (
+        <div class="card__media card__media--vacia">
+          <Icon name={categoria.icono} size="2.4rem" />
+          <span>Foto próximamente</span>
+        </div>
+      )
+    }
+    <figcaption class="card__caption">
+      <h3 class="card__title">{figura.titulo}</h3>
+      <span class="card__meta">{detalle}</span>
+    </figcaption>
+  </figure>
+</li>
+
+<style>
+  .item {
+    display: block;
+  }
+
+  .item[hidden] {
+    display: none;
+  }
+
+  .card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    width: 100%;
+  }
+
+  .card__media {
+    position: relative;
+    display: block;
+    width: 100%;
+    padding: 0;
+    overflow: hidden;
+    border-radius: var(--r-lg);
+    border: var(--bw) solid var(--line);
+    background: var(--surface);
+    box-shadow: var(--shadow-card);
+    aspect-ratio: 4 / 5;
+    transition:
+      transform 0.6s var(--ease-spring),
+      box-shadow 0.6s var(--ease-spring);
+  }
+
+  .card__media :global(picture) {
+    display: block;
+    height: 100%;
+  }
+
+  .card__media :global(img) {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: var(--encuadre, center);
+    transition: transform 1s var(--ease-out);
+  }
+
+  /* Fotos horizontales: completas, sobre su propia versión desenfocada */
+  .item--completa .card__media::before {
+    content: '';
+    position: absolute;
+    inset: -10%;
+    background: var(--fondo) center / cover;
+    filter: blur(18px) saturate(1.1);
+    opacity: 0.7;
+  }
+
+  .item--completa .card__media :global(img) {
+    object-fit: contain;
+  }
+
+  button.card__media {
+    cursor: pointer;
+  }
+
+  button.card__media:hover :global(img) {
+    transform: scale(1.04);
+  }
+
+  .card__zoom {
+    position: absolute;
+    right: 0.75rem;
+    bottom: 0.75rem;
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 999px;
+    background: var(--accent);
+    color: var(--accent-ink);
+    opacity: 0;
+    transform: translateY(6px) scale(0.9);
+    transition:
+      opacity 0.4s var(--ease-out),
+      transform 0.5s var(--ease-spring);
+  }
+
+  button.card__media:hover .card__zoom,
+  button.card__media:focus-visible .card__zoom {
+    opacity: 1;
+    transform: none;
+  }
+
+  .card__media--vacia {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    color: var(--muted);
+    font-size: var(--fs-sm);
+    background:
+      repeating-linear-gradient(to bottom, transparent 0 9px, var(--dot) 9px 10px),
+      var(--surface);
+  }
+
+  .card__media--vacia :global(.icon) {
+    color: var(--accent);
+    opacity: 0.75;
+  }
+
+  .card__caption {
+    display: grid;
+    gap: 0.15rem;
+    padding-inline: 0.25rem;
+  }
+
+  .card__title {
+    font-family: var(--font-display);
+    font-weight: var(--display-weight);
+    letter-spacing: -0.02em;
+    font-size: 1.1rem;
+  }
+
+  .card__meta {
+    font-family: var(--font-label);
+    font-size: var(--fs-xs);
+    color: var(--muted);
+  }
+
+  :global([data-theme='play']) .card__media--vacia {
+    color: var(--tone-ink);
+    background:
+      radial-gradient(var(--dot) 1.4px, transparent 1.8px) 0 0 / 18px 18px,
+      var(--bg-raised);
+  }
+
+  :global([data-theme='play']) .card__media--vacia :global(.icon) {
+    color: var(--tone-ink);
+    opacity: 1;
+  }
+
+  :global([data-theme='play']) .card__zoom {
+    border: var(--bw) solid var(--line);
+  }
+
+  :global([data-theme='play']) .item:hover .card__media {
+    transform: translate(-3px, -3px);
+    box-shadow: 9px 9px 0 var(--line);
+  }
+
+  :global([data-theme='play']) .item[data-categoria='personalizadas'] .card__media--vacia {
+    background-color: color-mix(in srgb, var(--tone-personalizadas) 35%, var(--bg-raised));
+  }
+  :global([data-theme='play']) .item[data-categoria='personajes'] .card__media--vacia {
+    background-color: color-mix(in srgb, var(--tone-personajes) 40%, var(--bg-raised));
+  }
+  :global([data-theme='play']) .item[data-categoria='decoracion'] .card__media--vacia {
+    background-color: color-mix(in srgb, var(--tone-decoracion) 40%, var(--bg-raised));
+  }
+  :global([data-theme='play']) .item[data-categoria='utiles'] .card__media--vacia {
+    background-color: color-mix(in srgb, var(--tone-utiles) 45%, var(--bg-raised));
+  }
+</style>

@@ -1,0 +1,141 @@
+---
+import Icon from './Icon.astro';
+
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<button
+  type="button"
+  class:list={['toggle', className]}
+  data-theme-toggle
+  aria-label="Cambiar a estilo Juguetón"
+  title="Cambiar a estilo Juguetón"
+>
+  <span class="toggle__knob" aria-hidden="true"></span>
+  <span class="toggle__opt toggle__opt--tech"><Icon name="circuitry" size="1.15rem" /></span>
+  <span class="toggle__opt toggle__opt--play"><Icon name="confetti" size="1.15rem" /></span>
+</button>
+
+<style>
+  .toggle {
+    position: relative;
+    display: inline-grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    width: 4.75rem;
+    height: 2.5rem;
+    padding: 0.25rem;
+    border-radius: 999px;
+    border: var(--bw) solid var(--line-strong);
+    background: var(--surface);
+    flex-shrink: 0;
+  }
+
+  .toggle__knob {
+    position: absolute;
+    top: 0.25rem;
+    left: 0.25rem;
+    width: calc(50% - 0.25rem);
+    height: calc(100% - 0.5rem);
+    border-radius: 999px;
+    background: var(--accent);
+    transition: transform 0.55s var(--ease-spring);
+  }
+
+  .toggle__opt {
+    position: relative;
+    display: grid;
+    place-items: center;
+    height: 100%;
+    color: var(--muted);
+    transition: color 0.3s var(--ease-out);
+  }
+
+  .toggle__opt--tech {
+    color: var(--accent-ink);
+  }
+
+  :global([data-theme='play']) .toggle__knob {
+    transform: translateX(100%);
+    background: var(--c-amarillo);
+    outline: var(--bw) solid var(--line);
+  }
+
+  :global([data-theme='play']) .toggle__opt--tech {
+    color: var(--muted);
+  }
+
+  :global([data-theme='play']) .toggle__opt--play {
+    color: var(--tone-ink);
+  }
+
+  .toggle:hover .toggle__knob {
+    transform: scale(0.94);
+  }
+
+  :global([data-theme='play']) .toggle:hover .toggle__knob {
+    transform: translateX(100%) scale(0.94);
+  }
+</style>
+
+<script>
+  type Tema = 'tech' | 'play';
+
+  const root = document.documentElement;
+  const botones = document.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]');
+  const sinMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  function aplicar(tema: Tema) {
+    root.dataset.theme = tema;
+    try {
+      localStorage.setItem('tema', tema);
+    } catch {}
+    document
+      .querySelector('meta[name="theme-color"]')
+      ?.setAttribute('content', tema === 'play' ? '#fff3f3' : '#0d0b0c');
+    sincronizar();
+  }
+
+  function sincronizar() {
+    const siguiente = root.dataset.theme === 'play' ? 'Tecnológico' : 'Juguetón';
+    botones.forEach((b) => {
+      b.setAttribute('aria-label', `Cambiar a estilo ${siguiente}`);
+      b.title = `Cambiar a estilo ${siguiente}`;
+    });
+  }
+
+  function alternar(evento: MouseEvent) {
+    const siguiente: Tema = root.dataset.theme === 'play' ? 'tech' : 'play';
+
+    if (!document.startViewTransition || sinMovimiento.matches) {
+      aplicar(siguiente);
+      return;
+    }
+
+    // Revela el nuevo tema con un círculo que crece desde el botón
+    const boton = evento.currentTarget as HTMLElement;
+    const caja = boton.getBoundingClientRect();
+    const x = caja.left + caja.width / 2;
+    const y = caja.top + caja.height / 2;
+    const radio = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
+
+    const transicion = document.startViewTransition(() => aplicar(siguiente));
+    transicion.ready.then(() => {
+      root.animate(
+        { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${radio}px at ${x}px ${y}px)`] },
+        {
+          duration: 700,
+          easing: 'cubic-bezier(0.16, 1, 0.3, 1)',
+          pseudoElement: '::view-transition-new(root)',
+        },
+      );
+    });
+  }
+
+  botones.forEach((b) => b.addEventListener('click', alternar));
+  sincronizar();
+</script>

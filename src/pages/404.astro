@@ -1,0 +1,47 @@
+---
+import Fondo from '../components/Fondo.astro';
+import Icon from '../components/Icon.astro';
+import Logo from '../components/Logo.astro';
+import { nombreCompleto } from '../config/sitio';
+import Base from '../layouts/Base.astro';
+---
+
+<Base title={`Página no encontrada | ${nombreCompleto}`} noindex>
+  <Fondo />
+  <main class="perdida" id="contenido">
+    <a href="/" aria-label="Ir al inicio"><Logo size={40} /></a>
+    <p class="perdida__codigo" aria-hidden="true">404</p>
+    <h1 class="perdida__titulo">Esta página se quedó sin filamento</h1>
+    <p class="lead">El enlace que seguiste no existe o cambió de lugar. Vuelve al inicio para ver todos los trabajos.</p>
+    <a class="btn btn--primary" href="/">
+      Volver al inicio
+      <span class="btn__icon"><Icon name="arrow-right" size="1.1rem" /></span>
+    </a>
+  </main>
+</Base>
+
+<style>
+  .perdida {
+    min-height: 100dvh;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: 1.5rem;
+    padding: 3rem var(--gutter);
+    text-align: center;
+  }
+
+  .perdida__codigo {
+    font-family: var(--font-display);
+    font-weight: var(--display-weight);
+    font-size: clamp(5rem, 3rem + 12vw, 10rem);
+    line-height: 1;
+    letter-spacing: -0.06em;
+    color: var(--accent);
+  }
+
+  .perdida__titulo {
+    font-size: var(--fs-h2);
+    max-width: 18ch;
+  }
+</style>

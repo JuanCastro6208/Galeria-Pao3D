@@ -1,0 +1,69 @@
+---
+import { Image } from 'astro:assets';
+import logoCirculo from '../assets/marca/logo-circulo.png';
+import { sitio } from '../config/sitio';
+
+interface Props {
+  size?: number;
+  class?: string;
+}
+
+const { size = 38, class: className } = Astro.props;
+---
+
+<span class:list={['logo', className]}>
+  <Image
+    src={logoCirculo}
+    alt=""
+    width={size}
+    height={size}
+    densities={[1, 2, 3]}
+    class="logo__mark"
+    loading="eager"
+  />
+  <span class="logo__word">
+    {sitio.nombre}<span class="logo__suffix">{sitio.sufijo}</span>
+  </span>
+</span>
+
+<style>
+  .logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .logo__mark {
+    border-radius: 999px;
+    box-shadow: 0 0 0 1px var(--line-strong);
+  }
+
+  .logo__word {
+    font-family: var(--font-display);
+    font-weight: var(--display-weight);
+    font-size: 1.2rem;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  .logo__suffix {
+    color: var(--accent);
+  }
+
+  :global([data-theme='play']) .logo__mark {
+    box-shadow: 0 0 0 2px var(--line);
+  }
+
+  :global([data-theme='play']) .logo__suffix {
+    display: inline-block;
+    margin-left: 0.15em;
+    padding: 0.12em 0.32em;
+    border: 2px solid var(--line);
+    border-radius: 0.4em;
+    background: var(--c-amarillo);
+    color: var(--tone-ink);
+    font-size: 0.8em;
+    transform: rotate(-6deg) translateY(-1px);
+  }
+</style>

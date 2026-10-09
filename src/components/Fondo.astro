@@ -1,0 +1,166 @@
+---
+// Fondo animado: manchas de color que se desplazan lentamente y
+// corazones/destellos (como los del volante de la marca) que suben
+// flotando detrás del contenido. Solo usa transform y opacity.
+import Heart from '@phosphor-icons/core/fill/heart-fill.svg';
+import Sparkle from '@phosphor-icons/core/fill/sparkle-fill.svg';
+import StarFour from '@phosphor-icons/core/fill/star-four-fill.svg';
+
+const iconos = [Heart, Sparkle, StarFour];
+const colores = ['var(--forma-1)', 'var(--forma-2)', 'var(--forma-3)', 'var(--forma-4)'];
+
+// Generador pseudoaleatorio con semilla fija: el fondo es igual en cada visita
+let semilla = 7;
+const azar = () => {
+  semilla = (semilla * 16807) % 2147483647;
+  return (semilla - 1) / 2147483646;
+};
+
+const formas = Array.from({ length: 16 }, (_, i) => {
+  const duracion = 22 + azar() * 20;
+  return {
+    Icono: iconos[i % iconos.length],
+    estilo: [
+      `--x:${(4 + azar() * 92).toFixed(1)}vw`,
+      `--y:${(5 + azar() * 90).toFixed(1)}vh`,
+      `--s:${Math.round(12 + azar() * 22)}px`,
+      `--t:${duracion.toFixed(1)}s`,
+      `--d:${(-azar() * duracion).toFixed(1)}s`,
+      `--dx:${Math.round(-60 + azar() * 120)}px`,
+      `--r:${Math.round(-200 + azar() * 400)}deg`,
+      `--o:${(0.55 + azar() * 0.45).toFixed(2)}`,
+      `--c:${colores[i % colores.length]}`,
+    ].join(';'),
+    extra: i >= 9,
+  };
+});
+---
+
+<div class="fondo" aria-hidden="true">
+  <span class="mancha mancha--1"></span>
+  <span class="mancha mancha--2"></span>
+  <span class="mancha mancha--3"></span>
+  {
+    formas.map(({ Icono, estilo, extra }) => (
+      <span class:list={['forma', { 'forma--extra': extra }]} style={estilo}>
+        <Icono width="100%" height="100%" />
+      </span>
+    ))
+  }
+</div>
+
+<style>
+  .fondo {
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    overflow: hidden;
+    pointer-events: none;
+
+    --mancha-1: rgb(var(--accent-rgb) / 0.2);
+    --mancha-2: rgb(184 166 255 / 0.12);
+    --mancha-3: rgb(var(--accent-rgb) / 0.1);
+    --forma-1: rgb(var(--accent-rgb) / 0.35);
+    --forma-2: rgb(255 226 234 / 0.22);
+    --forma-3: rgb(184 166 255 / 0.3);
+    --forma-4: rgb(var(--accent-rgb) / 0.22);
+  }
+
+  :global([data-theme='play']) .fondo {
+    --mancha-1: rgb(255 134 170 / 0.45);
+    --mancha-2: rgb(255 209 102 / 0.45);
+    --mancha-3: rgb(184 166 255 / 0.4);
+    --forma-1: var(--c-rosa);
+    --forma-2: var(--c-amarillo);
+    --forma-3: var(--c-lavanda);
+    --forma-4: var(--c-menta);
+  }
+
+  /* ── Manchas de color ─────────────────────────────────── */
+  .mancha {
+    position: absolute;
+    width: 60vmax;
+    height: 60vmax;
+    border-radius: 50%;
+    will-change: transform;
+    animation: derivar var(--t) ease-in-out infinite alternate;
+  }
+
+  .mancha--1 {
+    --t: 26s;
+    --mx: 14vw;
+    --my: 12vh;
+    top: -24vmax;
+    left: -18vmax;
+    background: radial-gradient(circle, var(--mancha-1), transparent 65%);
+  }
+
+  .mancha--2 {
+    --t: 32s;
+    --mx: -16vw;
+    --my: -10vh;
+    right: -22vmax;
+    bottom: -26vmax;
+    background: radial-gradient(circle, var(--mancha-2), transparent 65%);
+  }
+
+  .mancha--3 {
+    --t: 38s;
+    --mx: -20vw;
+    --my: 18vh;
+    width: 45vmax;
+    height: 45vmax;
+    top: 20%;
+    left: 55%;
+    background: radial-gradient(circle, var(--mancha-3), transparent 65%);
+  }
+
+  @keyframes derivar {
+    from {
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+    to {
+      transform: translate3d(var(--mx), var(--my), 0) scale(1.2);
+    }
+  }
+
+  /* ── Corazones y destellos que suben ─────────────────── */
+  .forma {
+    position: absolute;
+    top: 0;
+    left: var(--x);
+    width: var(--s);
+    height: var(--s);
+    color: var(--c);
+    opacity: var(--o);
+    will-change: transform;
+    animation: subir var(--t) linear var(--d) infinite;
+  }
+
+  @keyframes subir {
+    from {
+      transform: translate3d(0, 105vh, 0) rotate(0deg);
+    }
+    to {
+      transform: translate3d(var(--dx), -12vh, 0) rotate(var(--r));
+    }
+  }
+
+  @media (max-width: 640px) {
+    .forma--extra {
+      display: none;
+    }
+  }
+
+  /* Sin movimiento: las formas quedan quietas repartidas por la pantalla */
+  @media (prefers-reduced-motion: reduce) {
+    .mancha {
+      animation: none;
+    }
+
+    .forma {
+      animation: none;
+      transform: translateY(var(--y));
+    }
+  }
+</style>

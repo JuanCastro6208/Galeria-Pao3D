@@ -1,0 +1,238 @@
+---
+import { Image, Picture } from 'astro:assets';
+import logoCirculo from '../assets/marca/logo-circulo.png';
+import logoCompleto from '../assets/marca/logo.jpeg';
+import { enlaceWhatsApp, nombreCompleto, sitio } from '../config/sitio';
+import { altDeFigura, figuras } from '../data/figuras';
+import { imagenDeFigura } from '../lib/imagenes';
+import Icon from './Icon.astro';
+
+// Si hay una figura destacada con foto, se muestra en la portada.
+const destacada = figuras.find((f) => f.destacada && imagenDeFigura(f.imagen));
+const fotoDestacada = destacada ? imagenDeFigura(destacada.imagen) : undefined;
+---
+
+<section class="hero" id="inicio">
+  <div class="container hero__grid">
+    <div class="hero__copy">
+      <!-- El eslogan va dentro del h1: es el titular que Google lee primero -->
+      <h1 class="hero__h1">
+        <span class="tag" data-reveal style="--i:0">{sitio.eslogan}</span><span class="sr-only">: </span>
+        <span class="hero__title" data-reveal style="--i:1">
+          Damos vida a tus <span class="hero__accent">personajes.</span>
+        </span>
+      </h1>
+      <p class="lead" data-reveal style="--i:2">
+        Figuras de colección, réplicas personalizadas desde tu foto, decoración y regalos pintados a mano.
+      </p>
+      <div class="hero__ctas" data-reveal style="--i:3">
+        <a class="btn btn--primary" href={enlaceWhatsApp()} target="_blank" rel="noopener">
+          Cotiza por WhatsApp
+          <span class="btn__icon"><Icon name="whatsapp" size="1.25rem" /></span>
+        </a>
+        <a class="btn btn--ghost" href="#galeria">
+          Ver galería
+          <span class="btn__icon"><Icon name="arrow-right" size="1.1rem" /></span>
+        </a>
+      </div>
+    </div>
+
+    <div class="hero__visual" data-reveal style="--i:2">
+      <div class="shell">
+        <div class:list={['bed', { 'bed--foto': fotoDestacada }]}>
+          {
+            fotoDestacada && destacada ? (
+              <Picture
+                src={fotoDestacada}
+                alt={altDeFigura(destacada)}
+                formats={['avif', 'webp']}
+                widths={[480, 720, 960, 1200]}
+                sizes="(max-width: 860px) 92vw, 46vw"
+                loading="eager"
+                fetchpriority="high"
+                class="bed__photo"
+              />
+            ) : (
+              <Image
+                src={logoCompleto}
+                alt={`Logo de ${nombreCompleto}`}
+                widths={[480, 720, 1014]}
+                sizes="(max-width: 860px) 92vw, 46vw"
+                loading="eager"
+                class="bed__photo"
+              />
+            )
+          }
+        </div>
+      </div>
+      {
+        fotoDestacada && (
+          <Image src={logoCirculo} alt="" width={112} height={112} densities={[1, 2]} class="hero__sello" />
+        )
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    min-height: 100dvh;
+    display: flex;
+    align-items: center;
+    padding-block: 7.5rem 4rem;
+  }
+
+  .hero__grid {
+    display: grid;
+    grid-template-columns: 1.08fr 1fr;
+    align-items: center;
+    gap: clamp(2.5rem, 5vw, 5rem);
+  }
+
+  .hero__copy {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.6rem;
+  }
+
+  .hero__h1 {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.6rem;
+  }
+
+  .hero__title {
+    display: block;
+    font-size: var(--fs-display);
+    line-height: 0.98;
+  }
+
+  .hero__accent {
+    color: var(--accent);
+  }
+
+  :global([data-theme='play']) .hero__accent {
+    color: var(--text);
+    background: linear-gradient(transparent 58%, var(--c-amarillo) 58%, var(--c-amarillo) 92%, transparent 92%);
+    padding-inline: 0.06em;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+
+  .hero__ctas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.85rem;
+    margin-top: 0.4rem;
+  }
+
+  /* Marco doble: carcasa exterior + "cama" de impresión interior */
+  .shell {
+    padding: var(--shell-pad);
+    border-radius: calc(var(--r-lg) + var(--shell-pad));
+    border: var(--bw) solid var(--line);
+    background: var(--shell-bg);
+    box-shadow: var(--shadow-card);
+    transform: rotate(var(--tilt));
+    transition: transform 0.6s var(--ease-spring);
+  }
+
+  .bed {
+    position: relative;
+    display: grid;
+    place-items: center;
+    aspect-ratio: 1014 / 712;
+    overflow: hidden;
+    border-radius: var(--r-lg);
+    background:
+      radial-gradient(circle at 70% 25%, var(--accent-soft), transparent 60%),
+      radial-gradient(var(--dot) 1.2px, transparent 1.6px) 0 0 / 18px 18px,
+      var(--surface);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.05);
+  }
+
+  .bed--foto {
+    aspect-ratio: 4 / 5;
+  }
+
+  .hero__visual {
+    position: relative;
+  }
+
+  /* Sello con el logo, montado sobre la esquina de la foto */
+  :global(.hero__sello) {
+    position: absolute;
+    left: -1.75rem;
+    bottom: -1.75rem;
+    width: clamp(5rem, 9vw, 7rem);
+    height: auto;
+    border-radius: 999px;
+    box-shadow:
+      0 0 0 4px var(--bg),
+      0 18px 40px -16px rgb(0 0 0 / 0.7);
+    transform: rotate(-8deg);
+  }
+
+  :global([data-theme='play']) :global(.hero__sello) {
+    box-shadow:
+      0 0 0 2px var(--line),
+      4px 4px 0 2px var(--line);
+  }
+
+  :global([data-theme='play']) .bed {
+    background:
+      radial-gradient(var(--dot) 1.4px, transparent 1.8px) 0 0 / 20px 20px,
+      var(--c-chicle);
+  }
+
+  :global([data-theme='play']) .shell {
+    border-radius: var(--r-lg);
+    overflow: hidden;
+  }
+
+  :global([data-theme='play']) .bed {
+    border-radius: calc(var(--r-lg) - var(--bw));
+  }
+
+  .bed__photo,
+  .bed :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  @media (max-width: 860px) {
+    .hero {
+      min-height: auto;
+      padding-block: 7rem 3rem;
+    }
+
+    .hero__grid {
+      grid-template-columns: 1fr;
+    }
+
+    .hero__visual {
+      max-width: 21rem;
+      width: 100%;
+      justify-self: center;
+    }
+
+    :global(.hero__sello) {
+      left: -0.75rem;
+      bottom: -1rem;
+    }
+  }
+
+  @media (max-width: 420px) {
+    .hero__ctas,
+    .hero__ctas .btn {
+      width: 100%;
+    }
+
+    .hero__ctas .btn {
+      justify-content: space-between;
+    }
+  }
+</style>

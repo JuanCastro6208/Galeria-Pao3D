@@ -1,0 +1,136 @@
+---
+import { enlaceCorreo, enlaceFacebook, enlaceInstagram, enlaceWhatsApp, nombreCompleto, sitio } from '../config/sitio';
+import Icon from './Icon.astro';
+import Logo from './Logo.astro';
+
+const anio = new Date().getFullYear();
+---
+
+<footer class="footer">
+  <div class="container footer__grid">
+    <div class="footer__brand">
+      <Logo size={36} />
+      <p>{sitio.eslogan}. {sitio.frase}.</p>
+    </div>
+
+    <nav class="footer__nav" aria-label="Pie de página">
+      <a href="#categorias">Categorías</a>
+      <a href="#galeria">Galería</a>
+      <a href="#proceso">Proceso</a>
+      <a href="#contacto">Contacto</a>
+    </nav>
+
+    <div class="footer__social">
+      <a href={enlaceWhatsApp()} target="_blank" rel="noopener" aria-label="WhatsApp">
+        <Icon name="whatsapp" size="1.35rem" />
+      </a>
+      <a href={enlaceInstagram} target="_blank" rel="noopener" aria-label="Instagram">
+        <Icon name="instagram" size="1.35rem" />
+      </a>
+      <a href={enlaceFacebook} target="_blank" rel="noopener" aria-label="Facebook">
+        <Icon name="facebook" size="1.35rem" />
+      </a>
+      <a href={enlaceCorreo} aria-label="Correo">
+        <Icon name="envelope" size="1.35rem" />
+      </a>
+    </div>
+  </div>
+
+  <div class="container footer__bottom">
+    <p>© {anio} {nombreCompleto}. Todos los derechos reservados.</p>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    padding-block: 4rem 2rem;
+    border-top: var(--bw) solid var(--line);
+    background: var(--bg-raised);
+  }
+
+  .footer__grid {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr auto;
+    gap: 2.5rem;
+    align-items: start;
+  }
+
+  .footer__brand {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .footer__brand p {
+    max-width: 38ch;
+    color: var(--muted);
+    font-size: var(--fs-sm);
+  }
+
+  .footer__nav {
+    display: grid;
+    gap: 0.6rem;
+    font-size: var(--fs-sm);
+  }
+
+  .footer__nav a {
+    color: var(--muted);
+    width: fit-content;
+    transition: color 0.25s var(--ease-out);
+  }
+
+  .footer__nav a:hover {
+    color: var(--text);
+  }
+
+  .footer__social {
+    display: flex;
+    gap: 0.6rem;
+  }
+
+  .footer__social a {
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 999px;
+    border: var(--bw) solid var(--line-strong);
+    color: var(--text);
+    transition:
+      background-color 0.25s var(--ease-out),
+      color 0.25s var(--ease-out),
+      transform 0.4s var(--ease-spring);
+  }
+
+  .footer__social a:hover {
+    background: var(--accent);
+    color: var(--accent-ink);
+    transform: translateY(-2px);
+  }
+
+  .footer__bottom {
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: var(--bw) solid var(--line);
+    font-size: var(--fs-xs);
+    color: var(--muted);
+  }
+
+  :global([data-theme='play']) .footer__social a:hover {
+    background: var(--c-amarillo);
+  }
+
+  :global([data-theme='play']) .footer__bottom {
+    border-top-style: dashed;
+  }
+
+  @media (max-width: 760px) {
+    .footer__grid {
+      grid-template-columns: 1fr;
+    }
+
+    .footer__nav {
+      grid-template-columns: repeat(2, max-content);
+      column-gap: 2rem;
+    }
+  }
+</style>
