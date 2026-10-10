@@ -33,7 +33,7 @@ const estilo = [
 ]
   .filter(Boolean)
   .join(';');
-const detalle = [categoria.nombre, figura.material, figura.tamano].filter(Boolean).join(' / ');
+const detalle = [categoria.corto, figura.material, figura.tamano].filter(Boolean).join(' / ');
 ---
 
 <li class:list={['item', horizontal && 'item--completa']} data-categoria={figura.categoria} data-reveal style={estilo}>
@@ -232,10 +232,10 @@ const detalle = [categoria.nombre, figura.material, figura.tamano].filter(Boolea
   :global([data-theme='play']) .item[data-categoria='personajes'] .card__media--vacia {
     background-color: color-mix(in srgb, var(--tone-personajes) 40%, var(--bg-raised));
   }
-  :global([data-theme='play']) .item[data-categoria='decoracion'] .card__media--vacia {
-    background-color: color-mix(in srgb, var(--tone-decoracion) 40%, var(--bg-raised));
+  :global([data-theme='play']) .item[data-categoria='miniaturas'] .card__media--vacia {
+    background-color: color-mix(in srgb, var(--tone-miniaturas) 40%, var(--bg-raised));
   }
-  :global([data-theme='play']) .item[data-categoria='utiles'] .card__media--vacia {
-    background-color: color-mix(in srgb, var(--tone-utiles) 45%, var(--bg-raised));
+  :global([data-theme='play']) .item[data-categoria='vehiculos'] .card__media--vacia {
+    background-color: color-mix(in srgb, var(--tone-vehiculos) 45%, var(--bg-raised));
   }
 </style>

@@ -22,23 +22,8 @@ const tarjetas = categorias.map((c) => ({
         tarjetas.map((c, i) => (
           <li class:list={['cell', `cell--${c.id}`, { 'cell--foto': c.foto }]} data-reveal style={`--i:${i}`}>
             <a class="cell__core" href="#galeria" data-ir-filtro={c.id}>
-              <div class="cell__info">
-                {!c.foto && (
-                  <span class="cell__icon">
-                    <Icon name={c.icono} size="1.6rem" />
-                  </span>
-                )}
-                <div class="cell__body">
-                  <h3 class="cell__title">{c.nombre}</h3>
-                  <p class="cell__text">{c.descripcion}</p>
-                </div>
-                <span class="cell__more">
-                  Ver trabajos
-                  <Icon name="arrow-up-right" size="1rem" />
-                </span>
-              </div>
               {c.foto ? (
-                <span class="cell__foto">
+                <span class="cell__foto" style={`aspect-ratio: ${c.foto.width} / ${c.foto.height}`}>
                   <Picture
                     src={c.foto}
                     alt=""
@@ -48,6 +33,23 @@ const tarjetas = categorias.map((c) => ({
                   />
                 </span>
               ) : (
+                <span class="cell__icon">
+                  <Icon name={c.icono} size="1.6rem" />
+                </span>
+              )}
+              <div class="cell__body">
+                <h3 class="cell__title">
+                  {c.nombre}
+                  {'aclaracion' in c && <span class="cell__aclaracion">{c.aclaracion}</span>}
+                </h3>
+                <p class="cell__lema">{c.lema}</p>
+                <p class="cell__text">{c.descripcion}</p>
+              </div>
+              <span class="cell__more">
+                Ver trabajos
+                <Icon name="arrow-up-right" size="1rem" />
+              </span>
+              {!c.foto && (
                 <span class="cell__bg" aria-hidden="true">
                   <Icon name={c.icono} size="100%" />
                 </span>
@@ -112,21 +114,15 @@ const tarjetas = categorias.map((c) => ({
       background-color 0.4s var(--ease-out);
   }
 
-  .cell__info {
-    display: flex;
-    flex-direction: column;
-    gap: 1.25rem;
-    flex: 1;
-  }
-
-  /* Foto de la categoría (solo en las tarjetas grandes) */
+  /* Foto de la categoría (arriba, en la tarjeta alta).
+     El recuadro toma la proporción exacta de la foto, así se ve completa, sin recortes. */
   .cell__foto {
     position: relative;
     display: block;
+    flex: none;
     overflow: hidden;
     border-radius: var(--r-md);
     border: var(--bw) solid var(--line);
-    min-height: 12rem;
   }
 
   .cell__foto :global(picture),
@@ -146,24 +142,13 @@ const tarjetas = categorias.map((c) => ({
     transform: scale(1.04);
   }
 
-  /* Alta: foto arriba, texto abajo */
-  .cell--personalizadas .cell__foto {
-    order: -1;
-    flex: 1 1 14rem;
+  /* Con foto, el texto va pegado a ella y el espacio sobrante queda antes del enlace */
+  .cell--foto .cell__body {
+    margin-top: 0;
   }
 
-  .cell--personalizadas .cell__info {
-    flex: none;
-  }
-
-  /* Ancha: texto a la izquierda, foto a la derecha */
-  .cell--personajes.cell--foto .cell__core {
-    flex-direction: row;
-    align-items: stretch;
-  }
-
-  .cell--personajes .cell__foto {
-    flex: 0 0 50%;
+  .cell--foto .cell__more {
+    margin-top: auto;
   }
 
   .cell__icon {
@@ -181,11 +166,32 @@ const tarjetas = categorias.map((c) => ({
     display: grid;
     gap: 0.6rem;
     margin-top: auto;
-    max-width: 34ch;
+  }
+
+  /* La ancha tiene espacio de sobra: el texto no se estira de lado a lado */
+  .cell--personajes .cell__body {
+    max-width: 58ch;
   }
 
   .cell__title {
     font-size: var(--fs-h3);
+  }
+
+  .cell__aclaracion {
+    display: block;
+    margin-top: 0.5rem;
+    font-family: var(--font-label);
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    letter-spacing: var(--label-tracking);
+    text-transform: var(--label-transform);
+    color: var(--accent);
+  }
+
+  .cell__lema {
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    line-height: 1.5;
   }
 
   .cell__text {
@@ -244,8 +250,14 @@ const tarjetas = categorias.map((c) => ({
       var(--surface);
   }
 
+  .cell--personajes .cell__bg {
+    width: 34%;
+    top: 8%;
+    right: -3%;
+  }
+
   /* Líneas horizontales: la textura de las capas impresas */
-  .cell--utiles .cell__core {
+  .cell--vehiculos .cell__core {
     background:
       repeating-linear-gradient(to bottom, transparent 0 7px, rgb(255 226 234 / 0.035) 7px 8px),
       var(--surface);
@@ -272,11 +284,11 @@ const tarjetas = categorias.map((c) => ({
   :global([data-theme='play']) .cell--personajes {
     --tone: var(--tone-personajes);
   }
-  :global([data-theme='play']) .cell--decoracion {
-    --tone: var(--tone-decoracion);
+  :global([data-theme='play']) .cell--vehiculos {
+    --tone: var(--tone-vehiculos);
   }
-  :global([data-theme='play']) .cell--utiles {
-    --tone: var(--tone-utiles);
+  :global([data-theme='play']) .cell--miniaturas {
+    --tone: var(--tone-miniaturas);
   }
 
   :global([data-theme='play']) .cell__icon {
@@ -284,6 +296,7 @@ const tarjetas = categorias.map((c) => ({
     color: var(--tone-ink);
   }
 
+  :global([data-theme='play']) .cell__aclaracion,
   :global([data-theme='play']) .cell__text {
     color: var(--tone-ink);
   }
@@ -321,33 +334,34 @@ const tarjetas = categorias.map((c) => ({
       grid-row: auto;
     }
 
-    .cell--personalizadas .cell__core {
-      min-height: 20rem;
-    }
-
     .cell--personalizadas .cell__bg {
       width: 42%;
       top: -4%;
     }
   }
 
+  /* Tableta: la tarjeta con foto ocupa todo el ancho, así que la foto va al lado del texto */
+  @media (min-width: 641px) and (max-width: 960px) {
+    .cell--foto .cell__core {
+      display: grid;
+      grid-template-columns: 45% 1fr;
+      grid-template-rows: 1fr auto;
+      column-gap: 1.75rem;
+    }
+
+    .cell--foto .cell__foto {
+      grid-row: 1 / span 2;
+      align-self: start;
+    }
+
+    .cell--foto .cell__more {
+      margin-top: 0;
+    }
+  }
+
   @media (max-width: 640px) {
     .bento {
       grid-template-columns: 1fr;
-    }
-
-    .cell--personajes.cell--foto .cell__core {
-      flex-direction: column;
-    }
-
-    .cell--personajes .cell__foto {
-      order: -1;
-      flex: none;
-    }
-
-    .cell__foto {
-      min-height: 0;
-      aspect-ratio: 16 / 10;
     }
 
     .cell__core {

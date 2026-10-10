@@ -4,7 +4,7 @@ import { figuras } from '../data/figuras';
 import FiguraCard from './FiguraCard.astro';
 import Icon from './Icon.astro';
 
-const filtros = [{ id: 'todas', nombre: 'Todas' }, ...categorias.map((c) => ({ id: c.id, nombre: c.nombre }))];
+const filtros = [{ id: 'todas', nombre: 'Todas' }, ...categorias.map((c) => ({ id: c.id, nombre: c.corto }))];
 ---
 
 <section class="section galeria" id="galeria" aria-labelledby="galeria-titulo">
@@ -257,8 +257,53 @@ const filtros = [{ id: 'todas', nombre: 'Todas' }, ...categorias.map((c) => ({ i
     letter-spacing: -0.02em;
   }
 
+  /* Respeta los saltos de párrafo (\n\n) de la descripción */
   .lightbox__desc {
     color: var(--muted);
+    white-space: pre-line;
+    max-width: 62ch;
+    margin-inline: auto;
+  }
+
+  /* Pantallas anchas: foto a la izquierda y texto a la derecha, así cabe una descripción larga */
+  @media (min-width: 900px) {
+    /* Espacio a los lados para que las flechas no tapen el texto */
+    .lightbox {
+      padding-inline: 5rem;
+    }
+
+    .lightbox__frame {
+      grid-template-columns: minmax(0, auto) minmax(16rem, 22rem);
+      align-items: center;
+      gap: clamp(1.5rem, 3vw, 2.5rem);
+    }
+
+    .lightbox__media :global(img) {
+      max-height: calc(100dvh - 6rem);
+    }
+
+    .lightbox__info {
+      text-align: left;
+      gap: 0.6rem;
+      max-height: calc(100dvh - 6rem);
+      overflow-y: auto;
+    }
+
+    .lightbox__desc {
+      margin-inline: 0;
+    }
+  }
+
+  /* Celular: la foto un poco más baja y el visor se desplaza si el texto es largo */
+  @media (max-width: 899px) {
+    .lightbox[open] {
+      overflow-y: auto;
+      align-content: safe center;
+    }
+
+    .lightbox__media :global(img) {
+      max-height: 62dvh;
+    }
   }
 
   .lightbox__detalle {

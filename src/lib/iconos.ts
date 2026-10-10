@@ -12,11 +12,13 @@ import Cube from '@phosphor-icons/core/light/cube-light.svg';
 import EnvelopeSimple from '@phosphor-icons/core/light/envelope-simple-light.svg';
 import FacebookLogo from '@phosphor-icons/core/light/facebook-logo-light.svg';
 import Flower from '@phosphor-icons/core/light/flower-light.svg';
+import FlowerLotus from '@phosphor-icons/core/light/flower-lotus-light.svg';
 import GameController from '@phosphor-icons/core/light/game-controller-light.svg';
 import Gift from '@phosphor-icons/core/light/gift-light.svg';
 import Heart from '@phosphor-icons/core/light/heart-light.svg';
 import Image from '@phosphor-icons/core/light/image-light.svg';
 import InstagramLogo from '@phosphor-icons/core/light/instagram-logo-light.svg';
+import Jeep from '@phosphor-icons/core/light/jeep-light.svg';
 import Key from '@phosphor-icons/core/light/key-light.svg';
 import List from '@phosphor-icons/core/light/list-light.svg';
 import Package from '@phosphor-icons/core/light/package-light.svg';
@@ -42,11 +44,13 @@ export const iconos = {
   envelope: EnvelopeSimple,
   facebook: FacebookLogo,
   flower: Flower,
+  'flower-lotus': FlowerLotus,
   'game-controller': GameController,
   gift: Gift,
   heart: Heart,
   image: Image,
   instagram: InstagramLogo,
+  jeep: Jeep,
   key: Key,
   list: List,
   package: Package,

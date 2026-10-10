@@ -9,12 +9,14 @@ import type { CategoriaId } from './categorias';
 //   2. Agrega un bloque { ... } a la lista de abajo con el nombre del archivo
 //      en `imagen`. El orden de la lista es el orden en la página.
 //
-// Categorías válidas: 'personalizadas' | 'personajes' | 'decoracion' | 'utiles'
+// Categorías válidas: 'personalizadas' | 'personajes' | 'vehiculos' | 'miniaturas'
 // `masFotos` (opcional): otras fotos de la misma figura; se ven en el visor.
+// `descripcion` se lee al abrir la foto; usa \n\n para separar párrafos.
 // Todas las tarjetas tienen el mismo tamaño para que la galería quede alineada.
 // Las fotos verticales llenan la tarjeta; las horizontales se ven completas.
 // `encuadre` (opcional): qué parte de la foto mostrar si se recorta, ej: 'top', 'center 30%'.
-// `destacada: true` usa esa foto en la portada (solo la primera cuenta).
+// `destacada: true` pone la foto en el carrusel de la portada, en el orden de la lista
+//   (la primera es la que se ve al abrir la página; recomendado entre 4 y 7).
 // ─────────────────────────────────────────────────────────────
 
 export interface Figura {
@@ -44,7 +46,8 @@ export const figuras: Figura[] = [
     categoria: 'personajes',
     imagen: 'konan-frente.jpeg',
     masFotos: ['konan-lateral.jpeg', 'konan-comparacion.jpeg'],
-    descripcion: 'Con su capa de Akatsuki y alas de papel, pintada a mano con acabado brillante.',
+    descripcion:
+      'Un homenaje a Konan, la flor de papel y el pilar que protegió los ideales de Akatsuki hasta el final. Lograr que sus alas tuvieran esa textura de origami real y que pareciera flotar sobre su base fue un reto que valió cada segundo en el taller.',
     material: 'Pintada a mano',
     destacada: true,
   },
@@ -53,26 +56,29 @@ export const figuras: Figura[] = [
     categoria: 'personajes',
     imagen: 'lorgar-aurelian.jpeg',
     descripcion: 'Primarca de los Word Bearers con su crozius Illuminarum y su libro. Recién impreso, listo para pintar.',
+    destacada: true,
   },
   {
-    titulo: 'Niña con estrella',
+    titulo: 'Pequeña Soñadora (Chibi Custom)',
     categoria: 'personalizadas',
     imagen: 'nina-estrella.jpeg',
     masFotos: ['nina-estrella-comparacion.jpeg'],
     descripcion: 'Figura chibi hecha a partir de una foto, con su pijama de corazones.',
     material: 'Pintada a mano',
+    destacada: true,
   },
   {
-    titulo: 'This is fine',
+    titulo: 'Meme "This is Fine"',
     categoria: 'personajes',
     imagen: 'this-is-fine.jpeg',
     descripcion: 'Diorama del meme de KC Green: Question Hound con su taza de café entre las llamas.',
+    destacada: true,
   },
   {
-    titulo: 'Campero clásico a escala',
-    categoria: 'personalizadas',
-    imagen: 'campero-clasico.jpeg',
-    masFotos: ['campero-clasico-comparacion.jpeg'],
+    titulo: 'Réplica a Escala: Campero Clásico',
+    categoria: 'vehiculos',
+    imagen: 'campero-clasico-frente.jpeg',
+    masFotos: ['campero-clasico.jpeg', 'campero-clasico-comparacion.jpeg'],
     descripcion: 'Réplica a escala del campero familiar, hecha a partir de una foto antigua.',
   },
   {
@@ -84,20 +90,22 @@ export const figuras: Figura[] = [
     material: 'Pintada a mano',
   },
   {
-    titulo: 'Garfield kawaii',
-    categoria: 'personajes',
+    titulo: 'Garfield – Estilo Kawaii / Chibi',
+    categoria: 'miniaturas',
     imagen: 'garfield-kawaii.jpeg',
     masFotos: ['garfield-kawaii-lateral.jpeg'],
     descripcion: 'Versión tierna de Garfield, el gato naranja más perezoso de las caricaturas.',
+    destacada: true,
   },
   {
-    titulo: 'Orquídea y bonsái',
-    categoria: 'decoracion',
+    titulo: 'Dúo Botánico – Orquídea y Bonsái Sakura',
+    categoria: 'miniaturas',
     imagen: 'orquidea-y-bonsai.jpeg',
-    descripcion: 'Flores impresas y pintadas que decoran sin necesidad de riego.',
+    descripcion:
+      'Les presentamos nuestra línea de Miniaturas Botánicas: una pequeña orquídea morada y un bonsái de cerezo japonés (Sakura) que caben en la palma de tu mano.',
   },
   {
-    titulo: 'Niña con gafas',
+    titulo: 'Figura Chibi: Tu estilo en miniatura',
     categoria: 'personalizadas',
     imagen: 'nina-gafas.jpeg',
     masFotos: ['nina-gafas-comparacion.jpeg'],
@@ -105,28 +113,32 @@ export const figuras: Figura[] = [
     material: 'Pintada a mano',
   },
   {
-    titulo: 'Jax en traje de maid',
-    categoria: 'personajes',
+    titulo: 'Jax (Maid) – Digital Circus',
+    categoria: 'miniaturas',
     imagen: 'jax-maid.jpeg',
     masFotos: ['jax-maid-escritorio.jpeg'],
-    descripcion: 'Jax de The Amazing Digital Circus en versión chibi, pintado a mano.',
+    descripcion:
+      'Directo del caos de The Amazing Digital Circus, trajimos a la vida a este conejo morado en su versión más resignada y viral: ¡con traje de maid! 🐰🧹✨',
     material: 'Pintada a mano',
+    destacada: true,
   },
   {
-    titulo: 'Tripulantes de Among Us',
-    categoria: 'personajes',
+    titulo: 'Set de Tripulantes – Among Us',
+    categoria: 'miniaturas',
     imagen: 'among-us.jpeg',
-    descripcion: 'Set de tripulantes de colores para el escritorio.',
+    descripcion:
+      'Reportaron un cuerpo en la cafetería... digo, ¡en el escritorio! 😂✨\n\nDirecto del mapa de The Skeld en tu setup gamer, trajimos a la vida a esta tripulación de Among Us. ¿Quién creen que es el impostor? 🤔 Nosotros sospechamos del Rojo (siempre es el Rojo).',
   },
   {
-    titulo: 'Van y llaveros de BTS',
-    categoria: 'utiles',
+    titulo: 'Figura Van y Pines/Llaveros BT21 (BTS)',
+    categoria: 'miniaturas',
     imagen: 'bts-van-llaveros.jpeg',
-    descripcion: 'Figura de Van y llaveros de los personajes de BTS.',
+    descripcion:
+      'La fiebre por BTS se siente en la ciudad y en el taller no podíamos quedarnos por fuera. Diseñamos y fabricamos esta colección inspirada en el universo de BT21:\n\n🤖 Figura Coleccionable de Van: El robot protector que nos representa a todos, con su diseño bicolor característico y un acabado suave al tacto.\n\n🔑 Llaveros de Colección: Lleva a tu bias contigo a todas partes con Chimmy, Shooky, Tata, RJ y Van. Ligeros, resistentes y listos para lucir en tu bolso, llaves o lanyard.',
   },
   {
     titulo: 'Organizador de pilas',
-    categoria: 'utiles',
+    categoria: 'miniaturas',
     imagen: 'organizador-pilas.jpeg',
     descripcion: 'Canastas en miniatura para guardar pilas AA.',
   },

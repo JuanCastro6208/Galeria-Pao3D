@@ -29,14 +29,14 @@ Se adapta a celulares, tablets, computadores y pantallas grandes (2K, 4K y TV).
    ```ts
    {
      titulo: 'Dragón rojo',
-     categoria: 'personajes',        // personalizadas | personajes | decoracion | utiles
+     categoria: 'personajes',        // personalizadas | personajes | vehiculos | miniaturas
      imagen: 'dragon-rojo.jpg',      // nombre exacto del archivo
      masFotos: ['dragon-lado.jpg'],  // opcional: más fotos de la misma figura
      descripcion: 'Pintado a mano con detalles metálicos.',
      material: 'Pintada a mano',     // opcional
      tamano: '22 cm',                // opcional
      encuadre: 'top',                // opcional: qué parte de la foto mostrar si se recorta
-     destacada: true,                // opcional: la muestra en la portada
+     destacada: true,                // opcional: la agrega al carrusel de la portada
    },
    ```
 
@@ -45,6 +45,8 @@ Se adapta a celulares, tablets, computadores y pantallas grandes (2K, 4K y TV).
   verticales llenan la tarjeta; las horizontales se ven completas sobre un fondo desenfocado.
 - Si a una foto vertical se le corta la cabeza o la base, usa `encuadre`: `'top'` (arriba),
   `'bottom'` (abajo) o algo como `'center 30%'`.
+- El carrusel 3D de la portada muestra las figuras con `destacada: true`, en el orden de la
+  lista (la primera es la que se ve al abrir la página). Lo ideal es entre 4 y 7.
 - `masFotos` se ven en el visor al tocar la foto (por ejemplo, la comparación "foto real / figura").
 - Si una figura no tiene foto, aparece un espacio con el texto "Foto próximamente".
 

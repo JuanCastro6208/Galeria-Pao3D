@@ -66,14 +66,20 @@ export const sitio = {
   video: {
     /** Enlace de YouTube (normal o Shorts), ej: 'https://youtu.be/abc123'. */
     youtube: '',
+    /**
+     * true si YouTube no deja reproducirlo dentro de la página (por ejemplo, por
+     * derechos de la música): al tocarlo se abre en YouTube, en una pestaña nueva.
+     */
+    soloEnYouTube: false,
     /** O un archivo propio dentro de public/videos/, ej: 'proceso.mp4'. */
     archivo: '',
     /** Imagen de portada dentro de public/videos/ (opcional; con YouTube se usa la suya). */
     portada: '',
     /** true si el video se grabó con el celular en vertical. */
-    vertical: true,
+    vertical: false,
     titulo: 'Así damos vida a una figura',
-    descripcion: 'Del modelo 3D a la pintura a mano: el proceso completo de una pieza en el taller.',
+    /** Texto bajo el título (opcional). Déjalo vacío para mostrar solo el título. */
+    descripcion: '',
     /** Fecha en que se subió el video (AAAA-MM-DD); Google la pide para mostrarlo. */
     fecha: '',
   },

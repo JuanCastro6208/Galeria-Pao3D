@@ -55,7 +55,7 @@ const video = (idVideo || sitio.video.archivo) &&
   portadaVideo && {
     '@type': 'VideoObject',
     name: sitio.video.titulo,
-    description: sitio.video.descripcion,
+    description: sitio.video.descripcion || sitio.video.titulo,
     thumbnailUrl: portadaVideo,
     uploadDate: sitio.video.fecha,
     ...(idVideo

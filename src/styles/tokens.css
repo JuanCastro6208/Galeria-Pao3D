@@ -61,8 +61,8 @@
   /* En este tema todas las categorías comparten el acento */
   --tone-personalizadas: var(--accent);
   --tone-personajes: var(--accent);
-  --tone-decoracion: var(--accent);
-  --tone-utiles: var(--accent);
+  --tone-miniaturas: var(--accent);
+  --tone-vehiculos: var(--accent);
   --tone-ink: var(--accent-ink);
 
   --font-display: 'Geist Variable', ui-sans-serif, system-ui, sans-serif;
@@ -106,8 +106,8 @@
 
   --tone-personalizadas: var(--c-rosa);
   --tone-personajes: var(--c-lavanda);
-  --tone-decoracion: var(--c-menta);
-  --tone-utiles: var(--c-amarillo);
+  --tone-miniaturas: var(--c-menta);
+  --tone-vehiculos: var(--c-amarillo);
   --tone-ink: #2b1a24;
 
   --font-display: 'Bricolage Grotesque Variable', ui-rounded, system-ui, sans-serif;

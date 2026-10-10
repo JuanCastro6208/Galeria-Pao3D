@@ -7,9 +7,16 @@ import { altDeFigura, figuras } from '../data/figuras';
 import { imagenDeFigura } from '../lib/imagenes';
 import Icon from './Icon.astro';
 
-// Si hay una figura destacada con foto, se muestra en la portada.
-const destacada = figuras.find((f) => f.destacada && imagenDeFigura(f.imagen));
-const fotoDestacada = destacada ? imagenDeFigura(destacada.imagen) : undefined;
+// Las figuras destacadas con foto forman el carrusel de la portada (en el orden de la lista).
+const destacadas = figuras.flatMap((figura) => {
+  const foto = figura.destacada ? imagenDeFigura(figura.imagen) : undefined;
+  return foto ? [{ figura, foto }] : [];
+});
+const total = destacadas.length;
+
+// Lugar de cada foto respecto a la del centro: 0 = centro, 1/-1 = lados, ±2 = atrás.
+// Se calcula también aquí para que, sin JavaScript, el carrusel se vea armado.
+const posicion = (k: number, actual = 0) => ((k - actual + total + Math.floor(total / 2)) % total) - Math.floor(total / 2);
 ---
 
 <section class="hero" id="inicio">
@@ -38,21 +45,56 @@ const fotoDestacada = destacada ? imagenDeFigura(destacada.imagen) : undefined;
     </div>
 
     <div class="hero__visual" data-reveal style="--i:2">
-      <div class="shell">
-        <div class:list={['bed', { 'bed--foto': fotoDestacada }]}>
-          {
-            fotoDestacada && destacada ? (
-              <Picture
-                src={fotoDestacada}
-                alt={altDeFigura(destacada)}
-                formats={['avif', 'webp']}
-                widths={[480, 720, 960, 1200]}
-                sizes="(max-width: 860px) 92vw, 46vw"
-                loading="eager"
-                fetchpriority="high"
-                class="bed__photo"
-              />
-            ) : (
+      {
+        total > 0 ? (
+          <div class="carrusel" role="region" aria-roledescription="carrusel" aria-label="Trabajos destacados" data-carrusel>
+            <div class="carrusel__escena" data-escena>
+              {destacadas.map(({ figura, foto }, k) => (
+                <div
+                  class="carrusel__item"
+                  data-item
+                  data-pos={posicion(k)}
+                  role="group"
+                  aria-roledescription="diapositiva"
+                  aria-label={`${k + 1} de ${total}: ${figura.titulo}`}
+                  aria-hidden={k === 0 ? undefined : 'true'}
+                >
+                  <div class="shell">
+                    <div class="bed bed--foto">
+                      <Picture
+                        src={foto}
+                        alt={altDeFigura(figura)}
+                        formats={['avif', 'webp']}
+                        widths={[480, 720, 960]}
+                        sizes="(max-width: 860px) 70vw, 34vw"
+                        loading={k === 0 ? 'eager' : 'lazy'}
+                        fetchpriority={k === 0 ? 'high' : undefined}
+                        class="bed__photo"
+                        style={figura.encuadre ? `object-position: ${figura.encuadre}` : undefined}
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+              <Image src={logoCirculo} alt="" width={112} height={112} densities={[1, 2]} class="hero__sello" />
+            </div>
+            {total > 1 && (
+              <div class="carrusel__puntos" data-puntos hidden>
+                {destacadas.map(({ figura }, k) => (
+                  <button
+                    type="button"
+                    class="carrusel__punto"
+                    data-punto={k}
+                    aria-label={`Ver ${figura.titulo}`}
+                    aria-current={k === 0 ? 'true' : undefined}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        ) : (
+          <div class="shell">
+            <div class="bed">
               <Image
                 src={logoCompleto}
                 alt={`Logo de ${nombreCompleto}`}
@@ -61,13 +103,8 @@ const fotoDestacada = destacada ? imagenDeFigura(destacada.imagen) : undefined;
                 loading="eager"
                 class="bed__photo"
               />
-            )
-          }
-        </div>
-      </div>
-      {
-        fotoDestacada && (
-          <Image src={logoCirculo} alt="" width={112} height={112} densities={[1, 2]} class="hero__sello" />
+            </div>
+          </div>
         )
       }
     </div>
@@ -161,6 +198,153 @@ const fotoDestacada = destacada ? imagenDeFigura(destacada.imagen) : undefined;
     position: relative;
   }
 
+  /* ── Carrusel 3D (coverflow) ──
+     La foto del centro va al frente; las de los lados asoman detrás, giradas hacia el centro. */
+  .carrusel {
+    --ancho: 74%;
+    --lado-x: 34%;
+    --lado-z: -220px;
+    --lado-giro: 38deg;
+  }
+
+  .carrusel__escena {
+    position: relative;
+    width: var(--ancho);
+    margin-inline: auto;
+    aspect-ratio: 4 / 5;
+    perspective: 1400px;
+    transform: rotate(var(--tilt));
+    transition: transform 0.6s var(--ease-spring);
+    touch-action: pan-y;
+  }
+
+  .carrusel__item {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateZ(calc(var(--lado-z) * 3));
+    transition:
+      transform 0.9s var(--ease-spring),
+      opacity 0.6s var(--ease-out),
+      filter 0.6s var(--ease-out);
+  }
+
+  .carrusel .shell {
+    height: 100%;
+    transform: none;
+  }
+
+  .carrusel .bed {
+    height: 100%;
+    aspect-ratio: auto;
+  }
+
+  .carrusel__item[data-pos='0'] {
+    z-index: 3;
+    opacity: 1;
+    pointer-events: auto;
+    transform: none;
+  }
+
+  .carrusel__item[data-pos='1'],
+  .carrusel__item[data-pos='-1'] {
+    z-index: 2;
+    opacity: 1;
+    pointer-events: auto;
+    cursor: pointer;
+    filter: brightness(0.7) saturate(0.85);
+  }
+
+  .carrusel__item[data-pos='1']:hover,
+  .carrusel__item[data-pos='-1']:hover {
+    filter: brightness(0.85) saturate(0.95);
+  }
+
+  .carrusel__item[data-pos='1'] {
+    transform: translateX(var(--lado-x)) translateZ(var(--lado-z)) rotateY(calc(var(--lado-giro) * -1));
+  }
+
+  .carrusel__item[data-pos='-1'] {
+    transform: translateX(calc(var(--lado-x) * -1)) translateZ(var(--lado-z)) rotateY(var(--lado-giro));
+  }
+
+  /* Las de atrás esperan invisibles, para entrar y salir con suavidad */
+  .carrusel__item[data-pos='2'] {
+    z-index: 1;
+    transform: translateX(calc(var(--lado-x) * 1.5)) translateZ(calc(var(--lado-z) * 2)) rotateY(calc(var(--lado-giro) * -1.3));
+  }
+
+  .carrusel__item[data-pos='-2'] {
+    z-index: 1;
+    transform: translateX(calc(var(--lado-x) * -1.5)) translateZ(calc(var(--lado-z) * 2)) rotateY(calc(var(--lado-giro) * 1.3));
+  }
+
+  .carrusel__escena :global(.hero__sello) {
+    z-index: 5;
+  }
+
+  .carrusel__puntos {
+    display: flex;
+    justify-content: center;
+    gap: 0.15rem;
+    margin-top: 1.6rem;
+  }
+
+  .carrusel__puntos[hidden] {
+    display: none;
+  }
+
+  .carrusel__punto {
+    display: grid;
+    place-items: center;
+    width: 1.9rem;
+    height: 1.9rem;
+  }
+
+  .carrusel__punto::before {
+    content: '';
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 999px;
+    background: var(--line-strong);
+    transition:
+      width 0.5s var(--ease-spring),
+      background-color 0.3s var(--ease-out);
+  }
+
+  .carrusel__punto:hover::before {
+    background: var(--muted);
+  }
+
+  .carrusel__punto[aria-current='true']::before {
+    width: 1.5rem;
+    background: var(--accent);
+  }
+
+  :global([data-theme='play']) .carrusel__punto::before {
+    border: var(--bw) solid var(--line);
+    background: var(--surface);
+  }
+
+  :global([data-theme='play']) .carrusel__punto[aria-current='true']::before {
+    background: var(--c-amarillo);
+  }
+
+  /* Sin animaciones: solo cambia la foto del centro, con un fundido */
+  @media (prefers-reduced-motion: reduce) {
+    .carrusel .carrusel__item[data-pos] {
+      transform: none;
+      filter: none;
+      transition: opacity 0.4s var(--ease-out);
+    }
+
+    .carrusel .carrusel__item:not([data-pos='0']) {
+      opacity: 0;
+      pointer-events: none;
+    }
+  }
+
   /* Sello con el logo, montado sobre la esquina de la foto */
   :global(.hero__sello) {
     position: absolute;
@@ -214,9 +398,16 @@ const fotoDestacada = destacada ? imagenDeFigura(destacada.imagen) : undefined;
     }
 
     .hero__visual {
-      max-width: 21rem;
+      max-width: 24rem;
       width: 100%;
       justify-self: center;
+    }
+
+    .carrusel {
+      --ancho: 76%;
+      --lado-x: 30%;
+      --lado-z: -160px;
+      --lado-giro: 40deg;
     }
 
     :global(.hero__sello) {
@@ -236,3 +427,122 @@ const fotoDestacada = destacada ? imagenDeFigura(destacada.imagen) : undefined;
     }
   }
 </style>
+
+<script>
+  const carrusel = document.querySelector<HTMLElement>('[data-carrusel]');
+  const items = carrusel ? [...carrusel.querySelectorAll<HTMLElement>('[data-item]')] : [];
+
+  if (carrusel && items.length > 1) {
+    const escena = carrusel.querySelector<HTMLElement>('[data-escena]')!;
+    const contenedorPuntos = carrusel.querySelector<HTMLElement>('[data-puntos]')!;
+    const puntos = [...contenedorPuntos.querySelectorAll<HTMLButtonElement>('[data-punto]')];
+    const total = items.length;
+    const mitad = Math.floor(total / 2);
+    const INTERVALO = 3500;
+    const sinMovimiento = matchMedia('(prefers-reduced-motion: reduce)');
+
+    let actual = 0;
+    let temporizador: number | undefined;
+    let enPantalla = true;
+    let conMouse = false;
+    let conTeclado = false;
+
+    contenedorPuntos.hidden = false;
+
+    function mostrar(i: number) {
+      actual = (i + total) % total;
+      items.forEach((item, k) => {
+        const pos = ((k - actual + total + mitad) % total) - mitad;
+        item.dataset.pos = String(pos);
+        if (pos === 0) item.removeAttribute('aria-hidden');
+        else item.setAttribute('aria-hidden', 'true');
+      });
+      puntos.forEach((p, k) => {
+        if (k === actual) p.setAttribute('aria-current', 'true');
+        else p.removeAttribute('aria-current');
+      });
+    }
+
+    // Avance automático: se pausa si el mouse está encima, si se navega con teclado,
+    // si el carrusel no está en pantalla, si la pestaña está oculta o si se prefiere sin movimiento.
+    function programar() {
+      clearTimeout(temporizador);
+      if (sinMovimiento.matches || !enPantalla || conMouse || conTeclado || document.hidden) return;
+      temporizador = window.setTimeout(() => {
+        mostrar(actual + 1);
+        programar();
+      }, INTERVALO);
+    }
+
+    function ir(i: number) {
+      mostrar(i);
+      programar();
+    }
+
+    puntos.forEach((p, k) => p.addEventListener('click', () => ir(k)));
+
+    contenedorPuntos.addEventListener('keydown', (e) => {
+      if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+      e.preventDefault();
+      ir(actual + (e.key === 'ArrowRight' ? 1 : -1));
+      puntos[actual].focus();
+    });
+
+    // Tocar una foto lateral la trae al centro
+    let deslizo = false;
+    escena.addEventListener('click', (e) => {
+      if (deslizo) return;
+      const item = (e.target as HTMLElement).closest<HTMLElement>('[data-item]');
+      const pos = Number(item?.dataset.pos ?? 0);
+      if (pos !== 0) ir(actual + pos);
+    });
+
+    // Deslizar con el dedo en el celular
+    let inicioX: number | null = null;
+    escena.addEventListener('pointerdown', (e) => {
+      deslizo = false;
+      if (e.pointerType !== 'mouse') inicioX = e.clientX;
+    });
+    escena.addEventListener('pointerup', (e) => {
+      if (inicioX === null) return;
+      const dx = e.clientX - inicioX;
+      inicioX = null;
+      if (Math.abs(dx) > 40) {
+        deslizo = true;
+        ir(actual + (dx < 0 ? 1 : -1));
+      }
+    });
+    escena.addEventListener('pointercancel', () => (inicioX = null));
+
+    carrusel.addEventListener('pointerenter', (e) => {
+      if (e.pointerType !== 'mouse') return;
+      conMouse = true;
+      programar();
+    });
+    carrusel.addEventListener('pointerleave', (e) => {
+      if (e.pointerType !== 'mouse') return;
+      conMouse = false;
+      programar();
+    });
+    carrusel.addEventListener('focusin', (e) => {
+      conTeclado = (e.target as HTMLElement).matches(':focus-visible');
+      programar();
+    });
+    carrusel.addEventListener('focusout', (e) => {
+      if (carrusel.contains(e.relatedTarget as Node | null)) return;
+      conTeclado = false;
+      programar();
+    });
+
+    new IntersectionObserver(([entrada]) => {
+      enPantalla = entrada.isIntersecting;
+      programar();
+    }).observe(carrusel);
+
+    document.addEventListener('visibilitychange', programar);
+    sinMovimiento.addEventListener('change', programar);
+
+    mostrar(0);
+    programar();
+  }
+</script>
