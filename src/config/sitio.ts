@@ -22,7 +22,7 @@ export const sitio = {
    * Dirección pública del sitio, sin barra al final. CÁMBIALA al publicar:
    * de ella salen el enlace canónico, el sitemap y la imagen al compartir.
    */
-  url: 'https://galeriapao3d.example',
+  url: 'https://galeriapao3d.com',
 
   /** País (código de 2 letras) y ciudad; ayudan a aparecer en búsquedas locales. */
   pais: 'CO',
