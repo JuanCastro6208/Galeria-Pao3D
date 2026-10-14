@@ -13,8 +13,8 @@ import type { CategoriaId } from './categorias';
 // `masFotos` (opcional): otras fotos de la misma figura; se ven en el visor.
 // `descripcion` se lee al abrir la foto; usa \n\n para separar párrafos.
 // Todas las tarjetas tienen el mismo tamaño para que la galería quede alineada.
-// Las fotos verticales llenan la tarjeta; las horizontales se ven completas.
-// `encuadre` (opcional): qué parte de la foto mostrar si se recorta, ej: 'top', 'center 30%'.
+// La foto llena la tarjeta; en las horizontales se recortan los lados (en el visor se ven completas).
+// `encuadre` (opcional): qué parte de la foto mostrar si se recorta, ej: 'top', '40% center'.
 // `destacada: true` pone la foto en el carrusel de la portada, en el orden de la lista
 //   (la primera es la que se ve al abrir la página; recomendado entre 4 y 7).
 // ─────────────────────────────────────────────────────────────
@@ -82,6 +82,16 @@ export const figuras: Figura[] = [
     descripcion: 'Réplica a escala del campero familiar, hecha a partir de una foto antigua.',
   },
   {
+    titulo: 'Subaru Legacy del 93',
+    categoria: 'vehiculos',
+    imagen: 'subaru-legacy-93-frente.jpeg',
+    encuadre: '45% center',
+    masFotos: ['subaru-legacy-93-trasera.jpeg'],
+    descripcion:
+      'Hay carros que no son solo un medio de transporte; son parte de la familia, viajes inolvidables y momentos que marcaron época. 🚗❤️✨',
+    material: 'Pintada a mano',
+  },
+  {
     titulo: 'Coach Johanna',
     categoria: 'personalizadas',
     imagen: 'coach-johanna.jpeg',
@@ -101,6 +111,7 @@ export const figuras: Figura[] = [
     titulo: 'Dúo Botánico – Orquídea y Bonsái Sakura',
     categoria: 'miniaturas',
     imagen: 'orquidea-y-bonsai.jpeg',
+    encuadre: '38% center',
     descripcion:
       'Les presentamos nuestra línea de Miniaturas Botánicas: una pequeña orquídea morada y un bonsái de cerezo japonés (Sakura) que caben en la palma de tu mano.',
   },
@@ -126,6 +137,7 @@ export const figuras: Figura[] = [
     titulo: 'Set de Tripulantes – Among Us',
     categoria: 'miniaturas',
     imagen: 'among-us.jpeg',
+    encuadre: '42% center',
     descripcion:
       'Reportaron un cuerpo en la cafetería... digo, ¡en el escritorio! 😂✨\n\nDirecto del mapa de The Skeld en tu setup gamer, trajimos a la vida a esta tripulación de Among Us. ¿Quién creen que es el impostor? 🤔 Nosotros sospechamos del Rojo (siempre es el Rojo).',
   },
@@ -133,6 +145,7 @@ export const figuras: Figura[] = [
     titulo: 'Figura Van y Pines/Llaveros BT21 (BTS)',
     categoria: 'miniaturas',
     imagen: 'bts-van-llaveros.jpeg',
+    encuadre: '43% center',
     descripcion:
       'La fiebre por BTS se siente en la ciudad y en el taller no podíamos quedarnos por fuera. Diseñamos y fabricamos esta colección inspirada en el universo de BT21:\n\n🤖 Figura Coleccionable de Van: El robot protector que nos representa a todos, con su diseño bicolor característico y un acabado suave al tacto.\n\n🔑 Llaveros de Colección: Lleva a tu bias contigo a todas partes con Chimmy, Shooky, Tata, RJ y Van. Ligeros, resistentes y listos para lucir en tu bolso, llaves o lanyard.',
   },

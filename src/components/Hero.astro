@@ -194,6 +194,12 @@ const posicion = (k: number, actual = 0) => ((k - actual + total + Math.floor(to
     aspect-ratio: 4 / 5;
   }
 
+  /* La foto llena todo el marco, también las horizontales (se recortan los lados) */
+  .bed--foto :global(picture) {
+    position: absolute;
+    inset: 0;
+  }
+
   .hero__visual {
     position: relative;
   }
